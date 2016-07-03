@@ -140,14 +140,15 @@ public class BungeePexBridge extends Plugin {
             Connection c = getDB().getCon();
             try {
                 ProxiedPlayer player = getProxy().getPlayer(uuid);
-                ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + config.mysql_tableNames_permissions + "` WHERE name ='" + uuid.toString() + "' AND type='1' AND permission NOT LIKE 'name' AND permission NOT LIKE 'prefix'");
+                ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + config.mysql_tableNames_permissions + "` WHERE name ='" + uuid.toString() + "' AND type='"+(config.sexypex ? "0" : "1")+"' AND permission NOT LIKE 'name' AND permission NOT LIKE 'prefix'");
                 if (res.next())
                     PermPlayer.getPermPlayers().add(new PermPlayer(uuid));
-                res = c.createStatement().executeQuery("SELECT parent FROM `" + config.mysql_tableNames_permissionsInheritance + "` WHERE child ='" + uuid.toString() + "' AND type='1'");
+                res = c.createStatement().executeQuery("SELECT parent FROM `" + config.mysql_tableNames_permissionsInheritance + "` WHERE child ='" + uuid.toString() + "' AND type='"+(config.sexypex ? "0" : "1")+"'");
                 if (config.sexypex) {
                     player.removeGroups(player.getGroups().toArray(new String[player.getGroups().size()]));
-                    while (res.next())
+                    while (res.next()) {
                         player.addGroups(res.getString("parent"));
+                    }
                 } else if (res.next()) {
                     PermGroup permGroup = PermGroup.getPermGroup(res.getString("parent"));
                     if (permGroup != null)
