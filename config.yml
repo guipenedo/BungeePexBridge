@@ -1,0 +1,40 @@
+# Configuration file
+# #################
+# How to setup:
+# 1. Follow the instructions at https://goo.gl/ESlSaR to setup mysql backend on PEX
+# 2. Fill the options below with your database connection details
+# 3. Start up the server and enjoy!
+#
+# If you require assistance contact me:
+#   EMAIL: nostrumg@gmail.com SKYPE: gui_poseidon
+
+mysql:
+
+  # MySQL Hostname
+  hostname: localhost
+
+  # MySQL Username
+  user: root
+
+  # MySQL Password
+  pass: ''
+
+  # MySQL Database
+  db: database
+
+  # MySQL Port
+  port: '3306'
+  tableNames:
+
+    # PEX MySQL table names
+    # If you didn't change the default values on pex's config for 'aliases' leave as it is
+    permissions: permissions
+    permissions_inheritance: permissions_inheritance
+    permissions_entity: permissions_entity
+
+# Minutes between updating/reloading permissions automatically
+updateInterval: 120
+
+
+# SexyPex support - sync only player groups and get permissions from config.yml
+sexypex: false
