@@ -1,11 +1,11 @@
 package me.philipsnostrum.bungeepexbridge;
 
 import me.philipsnostrum.bungeepexbridge.commands.BPerms;
+import me.philipsnostrum.bungeepexbridge.helpers.Config;
+import me.philipsnostrum.bungeepexbridge.helpers.MySQL;
 import me.philipsnostrum.bungeepexbridge.listener.PermissionCheckListener;
 import me.philipsnostrum.bungeepexbridge.listener.PlayerDisconnectListener;
 import me.philipsnostrum.bungeepexbridge.listener.PostLoginListener;
-import me.philipsnostrum.bungeepexbridge.helpers.Config;
-import me.philipsnostrum.bungeepexbridge.helpers.MySQL;
 import me.philipsnostrum.bungeepexbridge.modules.PermGroup;
 import me.philipsnostrum.bungeepexbridge.modules.PermPlayer;
 import net.md_5.bungee.api.ChatColor;
@@ -13,13 +13,8 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
 import net.md_5.bungee.scheduler.BungeeScheduler;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,21 +24,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BungeePexBridge extends Plugin {
     private static BungeePexBridge instance;
-    private MySQL mysql;
     public Config config;
-    private static Configuration bungeeConfig = null;
-
-    public static Configuration getBungeeConfig(){
-        if (bungeeConfig == null) {
-            File mainDir = BungeePexBridge.get().getProxy().getPluginsFolder().getParentFile();
-            try {
-                bungeeConfig = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(mainDir, "config.yml"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return bungeeConfig;
-    }
+    private MySQL mysql;
 
     public static BungeePexBridge get() {
         return instance;
@@ -97,18 +79,14 @@ public class BungeePexBridge extends Plugin {
             public void run() {
                 PermGroup.getPermGroups().clear();
                 PermPlayer.getPermPlayers().clear();
-                if (getDB().enabled || config.sexypex) {
+                if (getDB().enabled && !config.sexypex) {
                     try {
-                        if (!config.sexypex) {
-                            Connection c = getDB().getCon();
-                            ResultSet res = c.createStatement().executeQuery("SELECT DISTINCT(name) as name FROM `" + config.mysql_tableNames_permissions + "` WHERE name NOT LIKE 'system' AND name NOT LIKE '%-%' AND type='0'");
+                        Connection c = getDB().getCon();
+                        ResultSet res = c.createStatement().executeQuery("SELECT DISTINCT(name) as name FROM `" + config.mysql_tableNames_permissions + "` WHERE name NOT LIKE 'system' AND name NOT LIKE '%-%' AND type='0'");
 
-                            while (res.next())
-                                PermGroup.getPermGroups().add(new PermGroup(res.getString("name")));
-                        }else{
-                            for (String group : bungeeConfig.getSection("permissions").getKeys())
-                                PermGroup.getPermGroups().add(new PermGroup(group));
-                        }
+                        while (res.next())
+                            PermGroup.getPermGroups().add(new PermGroup(res.getString("name")));
+
                         for (PermGroup permGroup : PermGroup.getPermGroups()) {
                             setupInheritance(permGroup);
                         }
@@ -161,11 +139,16 @@ public class BungeePexBridge extends Plugin {
         if (getDB().enabled) {
             Connection c = getDB().getCon();
             try {
+                ProxiedPlayer player = getProxy().getPlayer(uuid);
                 ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + config.mysql_tableNames_permissions + "` WHERE name ='" + uuid.toString() + "' AND type='1' AND permission NOT LIKE 'name' AND permission NOT LIKE 'prefix'");
                 if (res.next())
                     PermPlayer.getPermPlayers().add(new PermPlayer(uuid));
                 res = c.createStatement().executeQuery("SELECT parent FROM `" + config.mysql_tableNames_permissionsInheritance + "` WHERE child ='" + uuid.toString() + "' AND type='1'");
-                if (res.next()) {
+                if (config.sexypex) {
+                    player.removeGroups(player.getGroups().toArray(new String[player.getGroups().size()]));
+                    while (res.next())
+                        player.addGroups(res.getString("parent"));
+                } else if (res.next()) {
                     PermGroup permGroup = PermGroup.getPermGroup(res.getString("parent"));
                     if (permGroup != null)
                         permGroup.getPlayers().add(uuid.toString());

@@ -16,5 +16,7 @@ public class PlayerDisconnectListener implements Listener {
         PermPlayer permPlayer = PermPlayer.getPlayer(e.getPlayer().getUniqueId());
         if(permPlayer != null)
             PermPlayer.getPermPlayers().remove(permPlayer);
+        //clear groups
+        e.getPlayer().removeGroups(e.getPlayer().getGroups().toArray(new String[e.getPlayer().getGroups().size()]));
     }
 }

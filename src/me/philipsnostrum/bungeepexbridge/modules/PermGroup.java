@@ -18,44 +18,26 @@ public class PermGroup {
 
     public PermGroup(String name) {
         this.name = name;
-        if (!BungeePexBridge.getConfig().sexypex)
-            if (BungeePexBridge.getDB().enabled) {
-                try {
-                    List<String> perms = new ArrayList<String>();
-                    Connection c = BungeePexBridge.getDB().getCon();
-                    ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().mysql_tableNames_permissions + "` WHERE name = '" + name + "'");
-                    while (res.next()) {
-                        if (res.getString("permission").equalsIgnoreCase("default")) {
-                            defaultGroup = res.getString("value").equals("true");
-                            continue;
-                        }
-
-                        if (Arrays.asList("rank", "prefix").contains(res.getString("permission")))
-                            continue;
-                        perms.add(res.getString("permission"));
+        if (BungeePexBridge.getDB().enabled) {
+            try {
+                List<String> perms = new ArrayList<String>();
+                Connection c = BungeePexBridge.getDB().getCon();
+                ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().mysql_tableNames_permissions + "` WHERE name = '" + name + "'");
+                while (res.next()) {
+                    if (res.getString("permission").equalsIgnoreCase("default")) {
+                        defaultGroup = res.getString("value").equals("true");
+                        continue;
                     }
-                    loadPermissions(perms);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        else{
-                //load stuff from bungeeconfig
-                if (name.equals("default"))
-                    defaultGroup = true;
-                if (BungeePexBridge.getBungeeConfig().getStringList("permissions." + name) != null)
-                    loadPermissions(BungeePexBridge.getBungeeConfig().getStringList("permissions." + name));
-            }
-    }
 
-    private void loadPermissions (List<String> permissions){
-        for (String perm : permissions) {
-            if (perm.startsWith("-"))
-                revoked.add(perm.replace("-", ""));
-            else permissions.add(perm);
+                    if (Arrays.asList("rank", "prefix").contains(res.getString("permission")))
+                        continue;
+                    perms.add(res.getString("permission"));
+                }
+                loadPermissions(perms);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        for (String perm : revoked)
-            permissions.remove(perm);
     }
 
     public static ArrayList<PermGroup> getPermGroups() {
@@ -81,6 +63,16 @@ public class PermGroup {
             if (permGroup.getPlayers().contains(uuid.toString()))
                 return permGroup;
         return getDefaultGroup();
+    }
+
+    private void loadPermissions(List<String> permissions) {
+        for (String perm : permissions) {
+            if (perm.startsWith("-"))
+                revoked.add(perm.replace("-", ""));
+            else permissions.add(perm);
+        }
+        for (String perm : revoked)
+            permissions.remove(perm);
     }
 
     public ArrayList<String> getRevoked() {
