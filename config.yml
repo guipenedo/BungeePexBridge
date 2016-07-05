@@ -8,6 +8,13 @@
 # If you require assistance contact me:
 #   EMAIL: nostrumg@gmail.com SKYPE: gui_poseidon
 
+# Choose your permissions system. (ALL UPPERCASE AS ON THE LEFT LIST)
+# Supported systems:
+# PEX - PermissionsEx
+# SEXYPEX - SexyPex
+
+permissionsSystem: PEX
+
 mysql:
 
   # MySQL Hostname
@@ -24,17 +31,29 @@ mysql:
 
   # MySQL Port
   port: '3306'
-  tableNames:
-
-    # PEX MySQL table names
-    # If you didn't change the default values on pex's config for 'aliases' leave as it is
-    permissions: permissions
-    permissions_inheritance: permissions_inheritance
-    permissions_entity: permissions_entity
 
 # Minutes between updating/reloading permissions automatically
 updateInterval: 120
 
 
-# SexyPex support - sync only player groups and get permissions from config.yml
-sexypex: false
+
+# Optional settings for each permissions system. Only edit the settings under the permissions system you are using
+
+# PermissionsEx settings
+pex:
+  tables:
+
+    # PEX MySQL table names
+    # If you didn't change the default values on pex's config for 'aliases' leave as it is
+    permissions: permissions
+    permissionsInheritance: permissions_inheritance
+
+
+# SexyPex settings
+sexypex:
+  tables:
+
+    # SEXYPEX MySQL table names
+    # If you didn't change the default values on permissionsex's config for 'aliases' leave as it is
+    permissions: permissions
+    permissionsInheritance: permissions_inheritance

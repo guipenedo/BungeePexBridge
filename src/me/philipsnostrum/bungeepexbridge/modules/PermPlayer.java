@@ -2,17 +2,18 @@ package me.philipsnostrum.bungeepexbridge.modules;
 
 import me.philipsnostrum.bungeepexbridge.BungeePexBridge;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class PermPlayer {
+    public static void setPermPlayers(ArrayList<PermPlayer> permPlayers) {
+        PermPlayer.permPlayers = permPlayers;
+    }
+
     private static ArrayList<PermPlayer> permPlayers = new ArrayList<PermPlayer>();
     private UUID uuid;
-    private ArrayList<String> permissions = new ArrayList<String>();
+    private List<String> permissions;
 
     public static ArrayList<PermPlayer> getPermPlayers() {
         return permPlayers;
@@ -24,18 +25,10 @@ public class PermPlayer {
 
     public PermPlayer (UUID uuid){
         this.uuid = uuid;
-        if (BungeePexBridge.getDB().enabled){
-            try{
-                Connection c = BungeePexBridge.getDB().getCon();
-                ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().mysql_tableNames_permissions + "` WHERE name = '" + uuid.toString() + "'");
-                while(res.next()){
-                    if(Arrays.asList("rank", "prefix", "name").contains(res.getString("permission")))
-                        continue;
-                    permissions.add(res.getString("permission"));
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        try {
+            permissions = BungeePexBridge.getPerms().getPlayerPermissions(BungeePexBridge.get().getProxy().getPlayer(uuid));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

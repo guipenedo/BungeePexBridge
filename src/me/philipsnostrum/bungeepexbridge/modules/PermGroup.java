@@ -2,42 +2,29 @@ package me.philipsnostrum.bungeepexbridge.modules;
 
 import me.philipsnostrum.bungeepexbridge.BungeePexBridge;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class PermGroup {
+    public static void setPermGroups(ArrayList<PermGroup> permGroups) {
+        PermGroup.permGroups = permGroups;
+    }
+
     private static ArrayList<PermGroup> permGroups = new ArrayList<PermGroup>();
     private String name;
     private ArrayList<String> permissions = new ArrayList<String>(), revoked = new ArrayList<String>(), players = new ArrayList<String>();
-    private boolean inheritanceSetup = false, defaultGroup = false;
+    private boolean inheritanceSetup = false;
+
+    public void setDefaultGroup(boolean defaultGroup) {
+        this.defaultGroup = defaultGroup;
+    }
+
+    private boolean defaultGroup = false;
 
     public PermGroup(String name) {
         this.name = name;
-        if (BungeePexBridge.getDB().enabled) {
-            try {
-                List<String> perms = new ArrayList<String>();
-                Connection c = BungeePexBridge.getDB().getCon();
-                ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().mysql_tableNames_permissions + "` WHERE name = '" + name + "'");
-                while (res.next()) {
-                    if (res.getString("permission").equalsIgnoreCase("default")) {
-                        defaultGroup = res.getString("value").equals("true");
-                        continue;
-                    }
-
-                    if (Arrays.asList("rank", "prefix").contains(res.getString("permission")))
-                        continue;
-                    perms.add(res.getString("permission"));
-                }
-                loadPermissions(perms);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        loadPermissions(BungeePexBridge.getPerms().getGroupPermissions(name));
     }
 
     public static ArrayList<PermGroup> getPermGroups() {
@@ -58,21 +45,24 @@ public class PermGroup {
         return null;
     }
 
-    public static PermGroup getPlayerGroup(UUID uuid) {
+    public static ArrayList<PermGroup> getPlayerGroups(UUID uuid) {
+        ArrayList<PermGroup> groups = new ArrayList<PermGroup>();
         for (PermGroup permGroup : getPermGroups())
             if (permGroup.getPlayers().contains(uuid.toString()))
-                return permGroup;
-        return getDefaultGroup();
+                groups.add(permGroup);
+        if (groups.size() == 0 && getDefaultGroup() != null)
+            groups.add(getDefaultGroup());
+        return groups;
     }
 
     private void loadPermissions(List<String> permissions) {
         for (String perm : permissions) {
             if (perm.startsWith("-"))
                 revoked.add(perm.replace("-", ""));
-            else permissions.add(perm);
+            else this.permissions.add(perm);
         }
         for (String perm : revoked)
-            permissions.remove(perm);
+            this.permissions.remove(perm);
     }
 
     public ArrayList<String> getRevoked() {

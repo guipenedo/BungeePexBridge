@@ -9,11 +9,12 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class DebugPlayer {
     public static void debug(ProxiedPlayer player){
         PermPlayer permPlayer = PermPlayer.getPlayer(player.getUniqueId());
-        PermGroup permGroup = PermGroup.getPlayerGroup(player.getUniqueId());
+        ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(player.getUniqueId());
 
         Gson gson = new Gson();
 
@@ -33,8 +34,8 @@ public class DebugPlayer {
             if (permPlayer != null)
                 fileWriter.write(gson.toJson(permPlayer));
             fileWriter.write("\ngroups:\n");
-            if (permGroup != null)
-                fileWriter.write(gson.toJson(permGroup) + "\n");
+            if (permGroups != null)
+                fileWriter.write(gson.toJson(permGroups) + "\n");
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,48 +1,82 @@
 package me.philipsnostrum.bungeepexbridge.helpers;
 
-import me.philipsnostrum.bungeepexbridge.BungeePexBridge;
-
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 
 public class MySQL {
-    public Connection c = null;
-    public boolean enabled = false;
+	private String url;
+	/** The connection properties... user, pass, autoReconnect.. */
+	private Properties info;
+    public boolean enabled;
+	
+	private static final int MAX_CONNECTIONS = 8;
+	private static ArrayList<Connection> pool = new ArrayList<Connection>();
+	
+	public MySQL(String host, String user, String pass, String database, String port){
+		info = new Properties();
+		info.put("autoReconnect", "true");
+		info.put("user", user);
+		info.put("password", pass);
+		info.put("useUnicode", "true");
+		info.put("characterEncoding", "utf8");
+		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
+		
+		for(int i = 0; i < MAX_CONNECTIONS; i++) pool.add(null);
 
-    public MySQL() {
-        open();
-    }
+        enabled = getConnection() != null;
+	}
 
-    private void open() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            this.c = DriverManager.getConnection("jdbc:mysql://" + BungeePexBridge.getConfig().mysql_hostname + ":" + BungeePexBridge.getConfig().mysql_port + "/" + BungeePexBridge.getConfig().mysql_db + "?autoReconnect=true&useUnicode=yes", BungeePexBridge.getConfig().mysql_user, BungeePexBridge.getConfig().mysql_pass);
-            BungeePexBridge.get().getLogger().info("Connected to MySQL successfully");
-            enabled = true;
-        } catch (SQLException e) {
-            BungeePexBridge.get().getLogger().info("Could not connect to MySQL server! Disabling data loading!");
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            BungeePexBridge.get().getLogger().info("JDBC Driver not found!");
+    public void close(){
+        for(int i = 0; i < MAX_CONNECTIONS; i++) {
+            Connection connection = pool.get(i);
+            try {
+                if (connection != null && !connection.isClosed())
+                    connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
+	
+	/**
+	 * Gets the database connection for
+	 * executing queries on.
+	 * @return The database connection
+	 */
+	public Connection getConnection(){
+		for(int i = 0; i < MAX_CONNECTIONS; i++){
+			Connection connection = pool.get(i);
+			try{
+				//If we have a current connection, fetch it
+				if(connection != null && !connection.isClosed()){
+					if(connection.isValid(10)){
+						return connection;
+					}
+					//Else, it is invalid, so we return another connection.
+				}
+				connection = DriverManager.getConnection(this.url, info);
+				
+				pool.set(i, connection);
+				
+				return connection;
+			}
+			catch(SQLException ignored){
+			}
+		}
+		return null;
+	}
 
-    public Connection getCon() {
+    public List<String> resultSetToList(ResultSet res, String column){
+        List<String> list = new ArrayList<String>();
         try {
-            if (c == null || c.isClosed())
-                open();
+            while (res.next())
+                list.add(res.getString(column));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return c;
-    }
-
-    public void closeConnection() {
-        try {
-            c.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        c = null;
-        enabled = false;
+        return list;
     }
 }
