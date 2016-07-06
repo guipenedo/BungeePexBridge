@@ -19,6 +19,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.scheduler.BungeeScheduler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -86,7 +87,7 @@ public class BungeePexBridge extends Plugin {
                 if (mysql.enabled)
                     initialize(null);
             }
-        }, 0, config.updateInterval, TimeUnit.MINUTES);
+        }, config.updateInterval, config.updateInterval, TimeUnit.MINUTES);
     }
 
     private PermissionSystem loadPermissionsSystem() {
@@ -112,7 +113,12 @@ public class BungeePexBridge extends Plugin {
                     try {
                         for (String group : getPerms().getGroups())
                             groups.add(new PermGroup(group));
+
+                        //sort based on rank if available
+                        Collections.sort(groups);
+
                         PermGroup.setPermGroups(groups);
+
 
                         for (PermGroup permGroup : groups) {
                             setupInheritance(permGroup);
@@ -188,8 +194,15 @@ public class BungeePexBridge extends Plugin {
         PermPlayer permPlayer = PermPlayer.getPlayer(uuid);
         if (permPlayer != null && (permPlayer.hasPermission(permission) || permPlayer.hasPermission("*")))
             return true;
+        if (permPlayer != null && permPlayer.hasPermission("-" + permission))
+            return false;
         ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(uuid);
-        return permGroups != null && permGroups.size() > 0 && permGroups.get(0) != null && (permGroups.get(0).hasPermission(permission) || permGroups.get(0).hasPermission("*"));
+        for (PermGroup group : permGroups){
+            if (group == null) continue;
+            if (group.getRevoked().contains(permission)) return false;
+            if (group.getPermissions().contains(permission) || group.getPermissions().contains("*")) return true;
+        }
+        return false;
     }
 }
 

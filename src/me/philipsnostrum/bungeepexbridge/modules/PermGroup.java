@@ -6,29 +6,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PermGroup {
-    public static void setPermGroups(ArrayList<PermGroup> permGroups) {
-        PermGroup.permGroups = permGroups;
-    }
-
+public class PermGroup implements Comparable<PermGroup> {
     private static ArrayList<PermGroup> permGroups = new ArrayList<PermGroup>();
     private String name;
+    private long rank;
     private ArrayList<String> permissions = new ArrayList<String>(), revoked = new ArrayList<String>(), players = new ArrayList<String>();
     private boolean inheritanceSetup = false;
-
-    public void setDefaultGroup(boolean defaultGroup) {
-        this.defaultGroup = defaultGroup;
-    }
-
     private boolean defaultGroup = false;
-
     public PermGroup(String name) {
         this.name = name;
         loadPermissions(BungeePexBridge.getPerms().getGroupPermissions(name));
+        this.rank = BungeePexBridge.getPerms().getRank(name);
     }
 
     public static ArrayList<PermGroup> getPermGroups() {
         return permGroups;
+    }
+
+    public static void setPermGroups(ArrayList<PermGroup> permGroups) {
+        PermGroup.permGroups = permGroups;
     }
 
     public static PermGroup getPermGroup(String name) {
@@ -55,6 +51,10 @@ public class PermGroup {
         return groups;
     }
 
+    public long getRank() {
+        return rank;
+    }
+
     private void loadPermissions(List<String> permissions) {
         for (String perm : permissions) {
             if (perm.startsWith("-"))
@@ -77,6 +77,10 @@ public class PermGroup {
         return defaultGroup;
     }
 
+    public void setDefaultGroup(boolean defaultGroup) {
+        this.defaultGroup = defaultGroup;
+    }
+
     public String getName() {
         return name;
     }
@@ -93,10 +97,6 @@ public class PermGroup {
         return players;
     }
 
-    public boolean hasPermission(String permission) {
-        return permissions.contains(permission);
-    }
-
     public boolean isInheritanceSetup() {
         return this.inheritanceSetup;
     }
@@ -105,4 +105,15 @@ public class PermGroup {
         this.inheritanceSetup = inheritanceSetup;
     }
 
+    @Override
+    public int compareTo(PermGroup o) {
+        if (o.rank == rank)
+            return 1;
+        return Long.compare(rank, o.rank);
+    }
+
+    @Override
+    public String toString(){
+        return "name=" + name + " rank=" + rank;
+    }
 }

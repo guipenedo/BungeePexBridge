@@ -55,6 +55,19 @@ public class PermissionsEx implements PermissionSystem {
     }
 
     @Override
+    public long getRank(String group) {
+        Connection c = BungeePexBridge.getDB().getConnection();
+        try {
+            ResultSet res = c.createStatement().executeQuery("SELECT value FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name = '" + group + "' AND permission = 'rank'");
+            if (res.next())
+                return Long.parseLong(res.getString("value"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
     public List<String> getPlayerPermissions(ProxiedPlayer player) throws SQLException {
         Connection c = BungeePexBridge.getDB().getConnection();
         List<String> permissions = new ArrayList<String>();

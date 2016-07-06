@@ -35,6 +35,12 @@ public interface PermissionSystem {
     List<String> getInheritance(String group) throws Exception;
 
     /**
+     * @param group Permissions group name
+     * @return group's rank. "Less is more" - lowest rank = highest group. OR 0 if not supported/available
+     */
+    long getRank(String group);
+
+    /**
      * Retrieves player's individual permissions
      *
      * @param player UUID of player

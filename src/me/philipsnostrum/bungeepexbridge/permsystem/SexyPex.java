@@ -34,6 +34,11 @@ public class SexyPex implements PermissionSystem {
         return new ArrayList<String>();
     }
 
+    @Override
+    public long getRank(String group) {
+        return 0;
+    }
+
     //same as PermissionsEx
     @Override
     public List<String> getPlayerPermissions(ProxiedPlayer player) {
