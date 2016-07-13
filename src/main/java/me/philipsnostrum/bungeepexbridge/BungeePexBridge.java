@@ -16,7 +16,6 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.scheduler.BungeeScheduler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,8 +80,7 @@ public class BungeePexBridge extends Plugin {
         initialize(null);
 
         //update every x minutes
-        new BungeeScheduler().schedule(instance, new Runnable() {
-            @Override
+        getProxy().getScheduler().schedule(instance, new Runnable() {
             public void run() {
                 if (mysql.enabled)
                     initialize(null);
@@ -106,7 +104,6 @@ public class BungeePexBridge extends Plugin {
     public void initialize(final CommandSender sender) {
         try {
             getProxy().getScheduler().runAsync(this, new Runnable() {
-                @Override
                 public void run() {
                     ArrayList<PermGroup> groups = new ArrayList<PermGroup>();
                     ArrayList<PermPlayer> players = new ArrayList<PermPlayer>();
