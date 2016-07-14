@@ -13,11 +13,26 @@
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
             <version>1.10-20160713.010717-12</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ru.tehkode</groupId>
             <artifactId>PermissionsEx</artifactId>
             <version>1.23</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.mojang</groupId>
+                    <artifactId>AccountsClient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.gravitydevelopment.updater</groupId>
+                    <artifactId>updater</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-dbcp</groupId>
+                    <artifactId>commons-dbcp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -44,6 +59,18 @@
                             <goal>shade</goal>
                         </goals>
                         <phase>package</phase>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>ru.tehkode:PermissionsEx</artifact>
+                                    <includes>
+                                        <include>ru/tehkode/permissions/**</include>
+                                        <include>ru/tehkode/utils/**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
