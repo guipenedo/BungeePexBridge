@@ -62,6 +62,7 @@ public class Config {
     //permissions systems settings
     //PEX
     public String pex_tables_permissions = "permissions";
+    public String pex_tables_permissionsEntity = "permissions_entity";
     public String pex_tables_permissionsInheritance = "permissions_inheritance";
     //SEXYPEX
     public String sexypex_tables_permissions = "permissions";
