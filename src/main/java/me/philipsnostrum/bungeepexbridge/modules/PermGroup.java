@@ -10,7 +10,7 @@ public class PermGroup implements Comparable<PermGroup> {
     private static ArrayList<PermGroup> permGroups = new ArrayList<PermGroup>();
     private String name;
     private long rank;
-    private ArrayList<String> permissions = new ArrayList<String>(), revoked = new ArrayList<String>(), players = new ArrayList<String>();
+    private ArrayList<String> permissions = new ArrayList<String>(), players = new ArrayList<String>();
     private boolean inheritanceSetup = false;
     private boolean defaultGroup = false;
     public PermGroup(String name) {
@@ -56,17 +56,8 @@ public class PermGroup implements Comparable<PermGroup> {
     }
 
     private void loadPermissions(List<String> permissions) {
-        for (String perm : permissions) {
-            if (perm.startsWith("-"))
-                revoked.add(perm.replace("-", ""));
-            else this.permissions.add(perm);
-        }
-        for (String perm : revoked)
-            this.permissions.remove(perm);
-    }
-
-    public ArrayList<String> getRevoked() {
-        return revoked;
+        this.permissions.clear();
+        this.permissions.addAll(permissions);
     }
 
     public boolean isDefaultGroup() {

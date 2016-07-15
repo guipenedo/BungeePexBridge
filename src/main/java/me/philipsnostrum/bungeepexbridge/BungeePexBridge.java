@@ -16,11 +16,10 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.scheduler.BungeeScheduler;
+import ru.tehkode.permissions.PermissionMatcher;
+import ru.tehkode.permissions.RegExpMatcher;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -29,6 +28,7 @@ public class BungeePexBridge extends Plugin {
     private PermissionSystem permissionSystem;
     private Config config;
     private MySQL mysql;
+    private PermissionMatcher matcher = new RegExpMatcher();
 
     public static BungeePexBridge get() {
         return instance;
@@ -81,8 +81,7 @@ public class BungeePexBridge extends Plugin {
         initialize(null);
 
         //update every x minutes
-        new BungeeScheduler().schedule(instance, new Runnable() {
-            @Override
+        getProxy().getScheduler().schedule(instance, new Runnable() {
             public void run() {
                 if (mysql.enabled)
                     initialize(null);
@@ -106,7 +105,6 @@ public class BungeePexBridge extends Plugin {
     public void initialize(final CommandSender sender) {
         try {
             getProxy().getScheduler().runAsync(this, new Runnable() {
-                @Override
                 public void run() {
                     ArrayList<PermGroup> groups = new ArrayList<PermGroup>();
                     ArrayList<PermPlayer> players = new ArrayList<PermPlayer>();
@@ -157,18 +155,13 @@ public class BungeePexBridge extends Plugin {
                 if (!childGroup.isInheritanceSetup())
                     setupInheritance(childGroup);
 
-                //get child permissions and remove ones revoked by this group
-                ArrayList<String> permissions = new ArrayList<String>();
-                permissions.addAll(childGroup.getPermissions());
-                for (String perm : group.getRevoked())
-                    permissions.remove(perm);
-                //get child revoked permissions and remove ones given to this group
-                ArrayList<String> revoked = new ArrayList<String>();
-                revoked.addAll(childGroup.getRevoked());
-                for (String perm : group.getPermissions())
-                    revoked.remove("-" + perm);
-                group.getPermissions().addAll(permissions);
-                group.getRevoked().addAll(revoked);
+                // Just add the permissions last. Multiple may match, the order will ensure the correct thing is done.
+                // The one caveat is that entires with # should not be added
+                for(String childPermssion : childGroup.getPermissions()) {
+                    if(!childPermssion.startsWith("#")) {
+                        group.getPermissions().add(childPermssion);
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -192,17 +185,27 @@ public class BungeePexBridge extends Plugin {
 
     public boolean hasPermission(UUID uuid, String permission) {
         PermPlayer permPlayer = PermPlayer.getPlayer(uuid);
-        if (permPlayer != null && permPlayer.hasPermission("-" + permission))
-            return false;
-        if (permPlayer != null && (permPlayer.hasPermission(permission) || permPlayer.hasPermission("*")))
-            return true;
+        String matched;
+        if (permPlayer != null && (matched = matches(permPlayer.getPermissions(), permission)) != null) {
+            return !matched.startsWith("-");
+        }
         ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(uuid);
         for (PermGroup group : permGroups){
             if (group == null) continue;
-            if (group.getRevoked().contains(permission)) return false;
-            if (group.getPermissions().contains(permission) || group.getPermissions().contains("*")) return true;
+            if ((matched = matches(group.getPermissions(), permission)) != null) {
+                return !matched.startsWith("-");
+            }
         }
         return false;
+    }
+
+    private String matches(List<String> permissions, String permission) {
+        for (String expression : permissions) {
+            if (matcher.isMatches(expression, permission)) {
+                return expression;
+            }
+        }
+        return null;
     }
 }
 

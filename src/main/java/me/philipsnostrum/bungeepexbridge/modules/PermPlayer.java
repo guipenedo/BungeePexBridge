@@ -39,7 +39,7 @@ public class PermPlayer {
         return null;
     }
 
-    public boolean hasPermission(String permission){
-        return permissions.contains(permission);
+    public List<String> getPermissions() {
+        return permissions;
     }
 }
