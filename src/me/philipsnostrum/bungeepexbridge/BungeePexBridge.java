@@ -119,7 +119,6 @@ public class BungeePexBridge extends Plugin {
 
                         PermGroup.setPermGroups(groups);
 
-
                         for (PermGroup permGroup : groups) {
                             setupInheritance(permGroup);
                         }
@@ -133,6 +132,7 @@ public class BungeePexBridge extends Plugin {
 
                         for (ProxiedPlayer player : getProxy().getPlayers())
                             players.add(loadPlayer(player.getUniqueId()));
+                        
                         if (sender != null)
                             sender.sendMessage(new ComponentBuilder("Bungee permissions synced with " + config.permissionsSystem).color(ChatColor.GREEN).create());
                     } catch (Exception e) {
