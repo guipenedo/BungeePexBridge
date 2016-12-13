@@ -13,7 +13,7 @@ public class PostLoginListener implements Listener{
         try {
         	PermPlayer.getPermPlayers().add(BungeePexBridge.get().loadPlayer(e.getPlayer().getUniqueId()));
         }catch(Exception ex){
-        	System.err.println("Cant create permission player for "+e.getPlayer().getName()+"!");
+        	System.err.println("Cant create permission player for "+e.getPlayer().getName()+"! ("+ex.getMessage()+")");
         	ex.printStackTrace();
         }
     }

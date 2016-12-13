@@ -11,6 +11,7 @@ import me.philipsnostrum.bungeepexbridge.modules.PermPlayer;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionSystem;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionsEx;
 import me.philipsnostrum.bungeepexbridge.permsystem.SexyPex;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -91,9 +92,9 @@ public class BungeePexBridge extends Plugin {
     }
 
     private PermissionSystem loadPermissionsSystem() {
-        if (config.permissionsSystem.equals("PEX"))
+        if (config.permissionsSystem.equalsIgnoreCase("pex"))
             return new PermissionsEx();
-        else if (config.permissionsSystem.equals("SEXYPEX"))
+        else if (config.permissionsSystem.equalsIgnoreCase("sexypex"))
             return new SexyPex();
         else return null;
     }
@@ -178,6 +179,9 @@ public class BungeePexBridge extends Plugin {
 
     public PermPlayer loadPlayer(UUID uuid) throws Exception {
         ProxiedPlayer player = getProxy().getPlayer(uuid);
+        if(player == null)
+        	throw new NullPointerException("Cant find the player `"+(uuid == null ? "unknwon" : uuid.toString())+"`");
+        
         for (String group : permissionSystem.getPlayerGroups(player)){
             PermGroup permGroup = PermGroup.getPermGroup(group);
             if (permGroup != null)
