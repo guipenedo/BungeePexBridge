@@ -176,19 +176,14 @@ public class BungeePexBridge extends Plugin {
         }
     }
 
-    public PermPlayer loadPlayer(UUID uuid) {
-        try {
-            ProxiedPlayer player = getProxy().getPlayer(uuid);
-            for (String group : permissionSystem.getPlayerGroups(player)){
-                PermGroup permGroup = PermGroup.getPermGroup(group);
-                if (permGroup != null)
-                    permGroup.getPlayers().add(uuid.toString());
-            }
-            return new PermPlayer(player.getUniqueId());
-        } catch (Exception e) {
-            e.printStackTrace();
+    public PermPlayer loadPlayer(UUID uuid) throws Exception {
+        ProxiedPlayer player = getProxy().getPlayer(uuid);
+        for (String group : permissionSystem.getPlayerGroups(player)){
+            PermGroup permGroup = PermGroup.getPermGroup(group);
+            if (permGroup != null)
+                permGroup.getPlayers().add(uuid.toString());
         }
-        return null;
+        return new PermPlayer(player.getUniqueId());
     }
 
     public boolean hasPermission(UUID uuid, String permission) {
