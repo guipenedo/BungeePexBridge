@@ -19,7 +19,7 @@ public class PermissionsEx implements PermissionSystem {
 
     @Override
     public List<String> getGroups() throws SQLException {
-        Connection c = BungeePexBridge.getDB().getConnection();
+        Connection c = BungeePexBridge.getDB().getNextConnection();
         ResultSet res = c.createStatement().executeQuery("SELECT DISTINCT(name) as name FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name NOT LIKE 'system' AND name NOT LIKE '%-%' AND type='0'");
         return BungeePexBridge.getDB().resultSetToList(res, "name");
     }
@@ -27,7 +27,7 @@ public class PermissionsEx implements PermissionSystem {
     @Override
     public List<String> getGroupPermissions(String group) {
         List<String> perms = new ArrayList<String>();
-        Connection c = BungeePexBridge.getDB().getConnection();
+        Connection c = BungeePexBridge.getDB().getNextConnection();
         try {
             ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name = '" + group + "'");
 
@@ -44,7 +44,7 @@ public class PermissionsEx implements PermissionSystem {
 
     @Override
     public List<String> getInheritance(String group) throws SQLException {
-        Connection c = BungeePexBridge.getDB().getConnection();
+        Connection c = BungeePexBridge.getDB().getNextConnection();
         try {
             ResultSet res = c.createStatement().executeQuery("SELECT parent FROM `" + BungeePexBridge.getConfig().pex_tables_permissionsInheritance + "` WHERE child = '" + group + "' AND type='0'");
             return BungeePexBridge.getDB().resultSetToList(res, "parent");
@@ -56,7 +56,7 @@ public class PermissionsEx implements PermissionSystem {
 
     @Override
     public long getRank(String group) {
-        Connection c = BungeePexBridge.getDB().getConnection();
+        Connection c = BungeePexBridge.getDB().getNextConnection();
         try {
             ResultSet res = c.createStatement().executeQuery("SELECT value FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name = '" + group + "' AND permission = 'rank'");
             if (res.next())
@@ -69,7 +69,7 @@ public class PermissionsEx implements PermissionSystem {
 
     @Override
     public List<String> getPlayerPermissions(ProxiedPlayer player) throws SQLException {
-        Connection c = BungeePexBridge.getDB().getConnection();
+        Connection c = BungeePexBridge.getDB().getNextConnection();
         List<String> permissions = new ArrayList<String>();
         try {
             ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name = '" + player.getUniqueId().toString() + "'");
@@ -86,7 +86,7 @@ public class PermissionsEx implements PermissionSystem {
 
     @Override
     public List<String> getPlayerGroups(ProxiedPlayer player) throws SQLException {
-        Connection c = BungeePexBridge.getDB().getConnection();
+        Connection c = BungeePexBridge.getDB().getNextConnection();
         List<String> groups = new ArrayList<String>();
         ResultSet res = c.createStatement().executeQuery("SELECT parent FROM `" + BungeePexBridge.getConfig().pex_tables_permissionsInheritance + "` WHERE child ='" + player.getUniqueId().toString() + "' AND type='1'");
         while (res.next())
@@ -96,7 +96,7 @@ public class PermissionsEx implements PermissionSystem {
 
     @Override
     public String getDefaultGroup() {
-        Connection c = BungeePexBridge.getDB().getConnection();
+        Connection c = BungeePexBridge.getDB().getNextConnection();
         try {
             ResultSet res = c.createStatement().executeQuery("SELECT name FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE permission = 'default' AND value = 'true'");
             if (res.next())

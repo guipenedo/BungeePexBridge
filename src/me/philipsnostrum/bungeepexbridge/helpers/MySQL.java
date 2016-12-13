@@ -13,7 +13,7 @@ public class MySQL {
     public boolean enabled;
 	
 	private static final int MAX_CONNECTIONS = 8;
-	private static ArrayList<Connection> pool = new ArrayList<Connection>();
+	private static Connection[] connectionPool = new Connection[MAX_CONNECTIONS];
 	
 	public MySQL(String host, String user, String pass, String database, String port){
 		info = new Properties();
@@ -24,14 +24,12 @@ public class MySQL {
 		info.put("characterEncoding", "utf8");
 		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
 		
-		for(int i = 0; i < MAX_CONNECTIONS; i++) pool.add(null);
-
-        enabled = getConnection() != null;
+        enabled = getNextConnection() != null;
 	}
 
     public void close(){
         for(int i = 0; i < MAX_CONNECTIONS; i++) {
-            Connection connection = pool.get(i);
+            Connection connection = connectionPool[i];
             try {
                 if (connection != null && !connection.isClosed())
                     connection.close();
@@ -46,9 +44,9 @@ public class MySQL {
 	 * executing queries on.
 	 * @return The database connection
 	 */
-	public Connection getConnection(){
+	public Connection getNextConnection(){
 		for(int i = 0; i < MAX_CONNECTIONS; i++){
-			Connection connection = pool.get(i);
+			Connection connection = connectionPool[i];
 			try{
 				//If we have a current connection, fetch it
 				if(connection != null && !connection.isClosed()){
@@ -59,7 +57,7 @@ public class MySQL {
 				}
 				connection = DriverManager.getConnection(this.url, info);
 				
-				pool.set(i, connection);
+				connectionPool[i] = connection;
 				
 				return connection;
 			}
