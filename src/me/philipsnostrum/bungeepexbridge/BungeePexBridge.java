@@ -162,6 +162,7 @@ public class BungeePexBridge extends Plugin {
                 permissions.addAll(childGroup.getPermissions());
                 for (String perm : group.getRevoked())
                     permissions.remove(perm);
+                
                 //get child revoked permissions and remove ones given to this group
                 ArrayList<String> revoked = new ArrayList<String>();
                 revoked.addAll(childGroup.getRevoked());
