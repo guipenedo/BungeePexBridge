@@ -63,7 +63,7 @@ public class BungeePexBridge extends Plugin {
 
         if (permissionSystem.requiresMySQL()) {
             //database
-            mysql = new MySQL(config.mysql_hostname, config.mysql_user, config.mysql_pass, config.mysql_db, config.mysql_port);
+            mysql = new MySQL(config.mysql_hostname, config.mysql_user, config.mysql_pass, config.mysql_db, config.mysql_port, config.mysql_usessl.equals("true"));
             if (!mysql.enabled) {
                 getLogger().log(Level.SEVERE, "Disabling plugin! Permissions System requires a MySQL connection and one could not be established!");
                 return;

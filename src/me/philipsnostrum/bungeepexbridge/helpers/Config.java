@@ -55,6 +55,7 @@ public class Config {
     public String mysql_pass = "";
     public String mysql_db = "database";
     public String mysql_port = "3306";
+    public String mysql_usessl = "true";
     //permissions system
     public String permissionsSystem = "PEX";
     //update interval
@@ -62,6 +63,7 @@ public class Config {
     //permissions systems settings
     //PEX
     public String pex_tables_permissions = "permissions";
+    public String pex_tables_permissionsEntity = "permissions_entity";
     public String pex_tables_permissionsInheritance = "permissions_inheritance";
     //SEXYPEX
     public String sexypex_tables_permissions = "permissions";

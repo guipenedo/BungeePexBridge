@@ -15,13 +15,14 @@ public class MySQL {
 	private static final int MAX_CONNECTIONS = 8;
 	private static ArrayList<Connection> pool = new ArrayList<Connection>();
 	
-	public MySQL(String host, String user, String pass, String database, String port){
+    public MySQL(String host, String user, String pass, String database, String port, boolean useSSL){
 		info = new Properties();
 		info.put("autoReconnect", "true");
 		info.put("user", user);
 		info.put("password", pass);
 		info.put("useUnicode", "true");
 		info.put("characterEncoding", "utf8");
+                info.put("useSSL", useSSL ? "true" : "false");
 		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
 		
 		for(int i = 0; i < MAX_CONNECTIONS; i++) pool.add(null);
