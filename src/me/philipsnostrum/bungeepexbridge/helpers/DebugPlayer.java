@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class DebugPlayer {
-    public static void debug(ProxiedPlayer player){
+    public static void debug(ProxiedPlayer player) {
         PermPlayer permPlayer = PermPlayer.getPlayer(player.getUniqueId());
         ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(player.getUniqueId());
 

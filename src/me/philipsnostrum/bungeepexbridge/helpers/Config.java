@@ -12,6 +12,37 @@ import java.nio.file.Files;
 
 public class Config {
     public Configuration configuration;
+    //mysql
+    public String mysql_hostname = "localhost";
+    public String mysql_user = "root";
+    public String mysql_pass = "";
+    public String mysql_db = "database";
+    public String mysql_port = "3306";
+    //permissions system
+    public String permissionsSystem = "PEX";
+    //update interval
+    public int updateInterval = 120;
+    //permissions systems settings
+    //PEX
+    public String pex_tables_permissions = "permissions";
+    public String pex_tables_permissionsInheritance = "permissions_inheritance";
+    //SEXYPEX
+    public String sexypex_tables_permissions = "permissions";
+    public String sexypex_tables_permissionsInheritance = "permissions_inheritance";
+
+    public Config() {
+        loadConfig();
+
+        Field[] fields = getClass().getDeclaredFields();
+        for (Field f : fields) {
+            f.setAccessible(true);
+            try {
+                f.set(this, configuration.get(f.getName().replaceAll("_", "."), f.get(this)));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void loadConfig() {
         try {
@@ -28,41 +59,4 @@ public class Config {
             e.printStackTrace();
         }
     }
-
-    public Config(){
-        loadConfig();
-
-        Field[] fields = getClass().getDeclaredFields();
-        for(Field f : fields) {
-            f.setAccessible(true);
-            try {
-                f.set(this, configuration.get(f.getName().replaceAll("_", "."), f.get(this)));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    //mysql
-    public String mysql_hostname = "localhost";
-    public String mysql_user = "root";
-    public String mysql_pass = "";
-    public String mysql_db = "database";
-    public String mysql_port = "3306";
-    //permissions system
-    public String permissionsSystem = "PEX";
-    //update interval
-    public int updateInterval = 120;
-    //permissions systems settings
-    //PEX
-    public String pex_tables_permissions = "permissions";
-    public String pex_tables_permissionsInheritance = "permissions_inheritance";
-    //ZPERM
-    public String zperms_tables_permissionsInheritance = "inheritances";
-    public String zperms_tables_memberships = "memberships";
-    public String zperms_tables_entries = "entries";
-    public String zperms_tables_entities = "entities";
-    //SEXYPEX
-    public String sexypex_tables_permissions = "permissions";
-    public String sexypex_tables_permissionsInheritance = "permissions_inheritance";
 }

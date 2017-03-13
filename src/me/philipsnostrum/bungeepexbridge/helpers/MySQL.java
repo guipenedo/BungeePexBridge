@@ -11,12 +11,12 @@ public class MySQL {
 	/** The connection properties... user, pass, autoReconnect.. */
 	private Properties info;
     public boolean enabled;
-	
+
     private static final class CachedConnection {
     	private Connection connection;
     	private long lastTested;
     	private boolean valid = true;
-    	
+
     	public CachedConnection(Connection connection, long lastTested) {
 			this.connection = connection;
 			this.lastTested = lastTested;
@@ -26,7 +26,7 @@ public class MySQL {
 		public boolean isValid() throws SQLException{
 			if(!valid)
 				return valid;
-			
+
     		if(lastTested + 30 * 1000 < System.currentTimeMillis()){
     			if(!connection.isClosed() && connection.isValid(10))
     				return true;
@@ -36,10 +36,10 @@ public class MySQL {
     		return valid;
     	}
     }
-    
+
 	private static final int MAX_CONNECTIONS = 8;
 	private static CachedConnection[] connectionPool = new CachedConnection[MAX_CONNECTIONS];
-	
+
 	public MySQL(String host, String user, String pass, String database, String port){
 		info = new Properties();
 		info.put("autoReconnect", "true");
@@ -48,7 +48,7 @@ public class MySQL {
 		info.put("useUnicode", "true");
 		info.put("characterEncoding", "utf8");
 		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
-		
+
         try {
         	enabled = getNextConnection() != null;
         }catch(Exception e){
@@ -69,7 +69,7 @@ public class MySQL {
             }
         }
     }
-	
+
 	/**
 	 * Gets the database connection for
 	 * executing queries on.
@@ -83,7 +83,7 @@ public class MySQL {
 				//If we have a current connection, fetch it
 				if(connection != null && connection.isValid())
 					return connection.connection;
-				
+
 				connection = new CachedConnection(DriverManager.getConnection(this.url, info), System.currentTimeMillis());
 				connectionPool[i] = connection;
 				return connection.connection;
@@ -92,13 +92,13 @@ public class MySQL {
 				last = e;
 			}
 		}
-	
+
 		//Throw the last exception to break the stack. Dont do stuff this an broken SQL connection.
 		if(last != null){
 			System.err.println("Having exception on finding next connection!");
 			throw last;
 		}
-		
+
 		throw new SQLException("Cant find a valid SQL connection!");
 	}
 

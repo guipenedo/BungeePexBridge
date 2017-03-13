@@ -11,13 +11,13 @@ import java.util.List;
 public class PlayerDisconnectListener implements Listener {
 
     @EventHandler
-    public void onPlayerDisconnect (PlayerDisconnectEvent e){
+    public void onPlayerDisconnect(PlayerDisconnectEvent e) {
         List<PermGroup> permGroups = PermGroup.getPlayerGroups(e.getPlayer().getUniqueId());
         for (PermGroup group : permGroups)
             group.getPlayers().remove(e.getPlayer().getUniqueId().toString());
 
         PermPlayer permPlayer = PermPlayer.getPlayer(e.getPlayer().getUniqueId());
-        if(permPlayer != null)
+        if (permPlayer != null)
             PermPlayer.getPermPlayers().remove(permPlayer);
 
         //clear groups
