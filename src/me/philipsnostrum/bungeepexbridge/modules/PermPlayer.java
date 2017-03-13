@@ -1,6 +1,7 @@
 package me.philipsnostrum.bungeepexbridge.modules;
 
 import me.philipsnostrum.bungeepexbridge.BungeePexBridge;
+import net.md_5.bungee.BungeeCord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class PermPlayer {
         PermPlayer.permPlayers = permPlayers;
     }
 
-    private static ArrayList<PermPlayer> permPlayers = new ArrayList<PermPlayer>();
+    private static ArrayList<PermPlayer> permPlayers = new ArrayList<>();
     private UUID uuid;
     private List<String> permissions;
 
@@ -19,7 +20,7 @@ public class PermPlayer {
         return permPlayers;
     }
 
-    public UUID getUuid() {
+    private UUID getUuid() {
         return uuid;
     }
 
@@ -33,9 +34,13 @@ public class PermPlayer {
     }
 
     public static PermPlayer getPlayer(UUID uuid){
+        if(uuid == null) {
+            BungeeCord.getInstance().broadcast("DAPKIN IS STUPID");
+        }
         for(PermPlayer permPlayer : getPermPlayers())
-            if(permPlayer.getUuid().toString().equalsIgnoreCase(uuid.toString()))
+            if(permPlayer.getUuid().toString().replace("-","").equalsIgnoreCase(uuid.toString().replace("-",""))) {
                 return permPlayer;
+            }
         return null;
     }
 

@@ -20,18 +20,18 @@ public class SexyPex implements PermissionSystem {
     //No need to get groups as we let bungeecord handle permissions
     @Override
     public List<String> getGroups() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
     public List<String> getGroupPermissions(String group) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     //No support for this yet
     @Override
     public List<String> getInheritance(String group) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class SexyPex implements PermissionSystem {
     @Override
     public List<String> getPlayerPermissions(ProxiedPlayer player) {
         Connection c = BungeePexBridge.getDB().getConnection();
-        List<String> permissions = new ArrayList<String>();
+        List<String> permissions = new ArrayList<>();
         try {
             ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().sexypex_tables_permissions + "` WHERE name = '" + player.getUniqueId().toString() + "'");
             while (res.next()) {
@@ -70,7 +70,7 @@ public class SexyPex implements PermissionSystem {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     //No need to get groups as we let bungeecord handle permissions

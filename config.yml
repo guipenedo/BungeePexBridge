@@ -12,6 +12,7 @@
 # Supported systems:
 # PEX - PermissionsEx
 # SEXYPEX - SexyPex
+# ZPERMS - zPermissions
 
 permissionsSystem: PEX
 
@@ -57,3 +58,13 @@ sexypex:
     # If you didn't change the default values on permissionsex's config for 'aliases' leave as it is
     permissions: permissions
     permissionsInheritance: permissions_inheritance
+zperms:
+  tables:
+
+    # ZPERMS MySQL table names
+    # If you didn't change the default values on permissionsex's config for 'aliases' leave as it is
+    permissions: entries
+    permissionsInheritance: inheritances
+    memberships: memberships
+    entities: entities
+def-group: "Survivor"
