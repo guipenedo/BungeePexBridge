@@ -34,9 +34,6 @@ public class PermPlayer {
     }
 
     public static PermPlayer getPlayer(UUID uuid){
-        if(uuid == null) {
-            BungeeCord.getInstance().broadcast("DAPKIN IS STUPID");
-        }
         for(PermPlayer permPlayer : getPermPlayers())
             if(permPlayer.getUuid().toString().replace("-","").equalsIgnoreCase(uuid.toString().replace("-",""))) {
                 return permPlayer;
