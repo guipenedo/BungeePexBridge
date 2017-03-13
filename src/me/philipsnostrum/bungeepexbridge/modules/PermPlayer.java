@@ -34,8 +34,11 @@ public class PermPlayer {
     }
 
     public static PermPlayer getPlayer(UUID uuid){
+    	if(uuid == null)
+    		throw new NullPointerException("Invalid uuid!");
         for(PermPlayer permPlayer : getPermPlayers())
-            if(permPlayer.getUuid().toString().replace("-","").equalsIgnoreCase(uuid.toString().replace("-",""))) {
+        	if(permPlayer != null) //Funny why can this be null
+	            if(permPlayer.getUuid().toString().replace("-","").equalsIgnoreCase(uuid.toString().replace("-",""))) {
                 return permPlayer;
             }
         return null;

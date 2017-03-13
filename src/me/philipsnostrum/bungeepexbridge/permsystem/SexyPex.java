@@ -42,9 +42,9 @@ public class SexyPex implements PermissionSystem {
     //same as PermissionsEx
     @Override
     public List<String> getPlayerPermissions(ProxiedPlayer player) {
-        Connection c = BungeePexBridge.getDB().getConnection();
-        List<String> permissions = new ArrayList<>();
+    List<String> permissions = new ArrayList<>();
         try {
+        	Connection c = BungeePexBridge.getDB().getNextConnection();
             ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().sexypex_tables_permissions + "` WHERE name = '" + player.getUniqueId().toString() + "'");
             while (res.next()) {
                 if (Arrays.asList("rank", "prefix", "name").contains(res.getString("permission")))
@@ -60,10 +60,10 @@ public class SexyPex implements PermissionSystem {
     //No need to return groups as we let bungeecord handle permissions. Simply add player to his groups
     @Override
     public List<String> getPlayerGroups(ProxiedPlayer player) {
-        Connection c = BungeePexBridge.getDB().getConnection();
         //remove player groups
         player.removeGroups(player.getGroups().toArray(new String[player.getGroups().size()]));
         try {
+        	Connection c = BungeePexBridge.getDB().getNextConnection();
             ResultSet res = c.createStatement().executeQuery("SELECT parent FROM `" + BungeePexBridge.getConfig().sexypex_tables_permissionsInheritance + "` WHERE child ='" + player.getUniqueId().toString() + "' AND type='0'");
             while (res.next())
                 player.addGroups(res.getString("parent"));
