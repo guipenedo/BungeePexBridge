@@ -1,7 +1,6 @@
 package me.philipsnostrum.bungeepexbridge.modules;
 
 import me.philipsnostrum.bungeepexbridge.BungeePexBridge;
-import net.md_5.bungee.BungeeCord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ public class PermPlayer {
     private static ArrayList<PermPlayer> permPlayers = new ArrayList<>();
     private UUID uuid;
     private List<String> permissions;
-  
+
     public PermPlayer(UUID uuid) {
         this.uuid = uuid;
         try {
@@ -21,16 +20,7 @@ public class PermPlayer {
         }
     }
 
-    public static PermPlayer getPlayer(UUID uuid){
-    	if(uuid == null)
-    		throw new NullPointerException("Invalid uuid!");
-        for(PermPlayer permPlayer : getPermPlayers())
-        	if(permPlayer != null) //Funny why can this be null
-	            if(permPlayer.getUuid().toString().replace("-","").equalsIgnoreCase(uuid.toString().replace("-",""))) {
-                return permPlayer;
-            }
-    }
-  
+
     public static ArrayList<PermPlayer> getPermPlayers() {
         return permPlayers;
     }

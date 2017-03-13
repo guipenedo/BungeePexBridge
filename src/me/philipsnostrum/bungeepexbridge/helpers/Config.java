@@ -29,6 +29,11 @@ public class Config {
     //SEXYPEX
     public String sexypex_tables_permissions = "permissions";
     public String sexypex_tables_permissionsInheritance = "permissions_inheritance";
+    //ZPERM
+    public String zperms_tables_permissionsInheritance = "inheritances";
+    public String zperms_tables_memberships = "memberships";
+    public String zperms_tables_entries = "entries";
+    public String zperms_tables_entities = "entities";
 
     public Config() {
         loadConfig();
