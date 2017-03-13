@@ -13,6 +13,7 @@ public class PermGroup implements Comparable<PermGroup> {
     private ArrayList<String> permissions = new ArrayList<String>(), revoked = new ArrayList<String>(), players = new ArrayList<String>();
     private boolean inheritanceSetup = false;
     private boolean defaultGroup = false;
+
     public PermGroup(String name) {
         this.name = name;
         loadPermissions(BungeePexBridge.getPerms().getGroupPermissions(name));
@@ -105,7 +106,7 @@ public class PermGroup implements Comparable<PermGroup> {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "name=" + name + " rank=" + rank;
     }
 }

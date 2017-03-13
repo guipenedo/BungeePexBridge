@@ -44,7 +44,7 @@ public class SexyPex implements PermissionSystem {
     public List<String> getPlayerPermissions(ProxiedPlayer player) {
         List<String> permissions = new ArrayList<String>();
         try {
-        	Connection c = BungeePexBridge.getDB().getNextConnection();
+            Connection c = BungeePexBridge.getDB().getNextConnection();
             ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().sexypex_tables_permissions + "` WHERE name = '" + player.getUniqueId().toString() + "'");
             while (res.next()) {
                 if (Arrays.asList("rank", "prefix", "name").contains(res.getString("permission")))
@@ -63,7 +63,7 @@ public class SexyPex implements PermissionSystem {
         //remove player groups
         player.removeGroups(player.getGroups().toArray(new String[player.getGroups().size()]));
         try {
-        	Connection c = BungeePexBridge.getDB().getNextConnection();
+            Connection c = BungeePexBridge.getDB().getNextConnection();
             ResultSet res = c.createStatement().executeQuery("SELECT parent FROM `" + BungeePexBridge.getConfig().sexypex_tables_permissionsInheritance + "` WHERE child ='" + player.getUniqueId().toString() + "' AND type='0'");
             while (res.next())
                 player.addGroups(res.getString("parent"));

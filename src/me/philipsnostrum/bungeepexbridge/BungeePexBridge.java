@@ -1,8 +1,8 @@
 package me.philipsnostrum.bungeepexbridge;
 
 import me.philipsnostrum.bungeepexbridge.commands.BPerms;
-import me.philipsnostrum.bungeepexbridge.helpers.MySQL;
 import me.philipsnostrum.bungeepexbridge.helpers.Config;
+import me.philipsnostrum.bungeepexbridge.helpers.MySQL;
 import me.philipsnostrum.bungeepexbridge.listener.PermissionCheckListener;
 import me.philipsnostrum.bungeepexbridge.listener.PlayerDisconnectListener;
 import me.philipsnostrum.bungeepexbridge.listener.PostLoginListener;
@@ -11,7 +11,6 @@ import me.philipsnostrum.bungeepexbridge.modules.PermPlayer;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionSystem;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionsEx;
 import me.philipsnostrum.bungeepexbridge.permsystem.SexyPex;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -58,7 +57,7 @@ public class BungeePexBridge extends Plugin {
         if (permissionSystem == null) {
             getLogger().log(Level.SEVERE, "Disabling plugin! Permission system " + config.permissionsSystem + " not found! Check the plugin page for configuration help.");
             return;
-        }else
+        } else
             getLogger().log(Level.INFO, "Permission system " + config.permissionsSystem + " loaded successfully!");
 
 
@@ -133,7 +132,7 @@ public class BungeePexBridge extends Plugin {
 
                         for (ProxiedPlayer player : getProxy().getPlayers())
                             players.add(loadPlayer(player.getUniqueId()));
-                        
+
                         if (sender != null)
                             sender.sendMessage(new ComponentBuilder("Bungee permissions synced with " + config.permissionsSystem).color(ChatColor.GREEN).create());
                     } catch (Exception e) {
@@ -144,7 +143,8 @@ public class BungeePexBridge extends Plugin {
                     PermPlayer.setPermPlayers(players);
                 }
             });
-        }catch (java.util.concurrent.RejectedExecutionException ignored){}
+        } catch (java.util.concurrent.RejectedExecutionException ignored) {
+        }
     }
 
     public void setupInheritance(PermGroup group) {
@@ -163,7 +163,7 @@ public class BungeePexBridge extends Plugin {
                 permissions.addAll(childGroup.getPermissions());
                 for (String perm : group.getRevoked())
                     permissions.remove(perm);
-                
+
                 //get child revoked permissions and remove ones given to this group
                 ArrayList<String> revoked = new ArrayList<String>();
                 revoked.addAll(childGroup.getRevoked());
@@ -179,10 +179,10 @@ public class BungeePexBridge extends Plugin {
 
     public PermPlayer loadPlayer(UUID uuid) throws Exception {
         ProxiedPlayer player = getProxy().getPlayer(uuid);
-        if(player == null)
-        	throw new NullPointerException("Cant find the player `"+(uuid == null ? "unknwon" : uuid.toString())+"`");
-        
-        for (String group : permissionSystem.getPlayerGroups(player)){
+        if (player == null)
+            throw new NullPointerException("Can't find the player `" + (uuid == null ? "unknown" : uuid.toString()) + "`");
+
+        for (String group : permissionSystem.getPlayerGroups(player)) {
             PermGroup permGroup = PermGroup.getPermGroup(group);
             if (permGroup != null)
                 permGroup.getPlayers().add(uuid.toString());
@@ -197,7 +197,7 @@ public class BungeePexBridge extends Plugin {
         if (permPlayer != null && (permPlayer.hasPermission(permission) || permPlayer.hasPermission("*")))
             return true;
         ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(uuid);
-        for (PermGroup group : permGroups){
+        for (PermGroup group : permGroups) {
             if (group == null) continue;
             if (group.getRevoked().contains(permission)) return false;
             if (group.getPermissions().contains(permission) || group.getPermissions().contains("*")) return true;
