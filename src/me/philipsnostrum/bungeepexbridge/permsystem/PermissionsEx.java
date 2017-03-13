@@ -72,7 +72,7 @@ public class PermissionsEx implements PermissionSystem {
         Connection c = BungeePexBridge.getDB().getConnection();
         List<String> permissions = new ArrayList<>();
         try {
-            ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE member = '" + player.getUniqueId().toString() + "'");
+            ResultSet res = c.createStatement().executeQuery("SELECT * FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name = '" + player.getUniqueId().toString() + "'");
             while (res.next()) {
                 if (Arrays.asList("rank", "prefix", "name").contains(res.getString("permission")))
                     continue;
@@ -88,7 +88,7 @@ public class PermissionsEx implements PermissionSystem {
     public List<String> getPlayerGroups(ProxiedPlayer player) throws SQLException {
         Connection c = BungeePexBridge.getDB().getConnection();
         List<String> groups = new ArrayList<>();
-        ResultSet res = c.createStatement().executeQuery("SELECT parent FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE child ='" + player.getUniqueId().toString() + "' AND type='1'");
+        ResultSet res = c.createStatement().executeQuery("SELECT parent FROM `" + BungeePexBridge.getConfig().pex_tables_permissionsInheritance + "` WHERE child ='" + player.getUniqueId().toString() + "' AND type='1'");
         while (res.next())
             groups.add(res.getString("parent"));
         return groups;
