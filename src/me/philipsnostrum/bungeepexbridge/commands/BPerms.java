@@ -11,7 +11,8 @@ public class BPerms extends Command {
         super("bpb", "bungeepexbridge.reload", "bungeepexbridge", "bpexb", "bpexbridge");
     }
 
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void execute(CommandSender commandSender, String[] strings) {
         if (strings.length == 2 && strings[0].equalsIgnoreCase("debug")) {
             ProxiedPlayer player = BungeePexBridge.get().getProxy().getPlayer(strings[1]);

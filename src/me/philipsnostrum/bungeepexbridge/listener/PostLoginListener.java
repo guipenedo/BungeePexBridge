@@ -10,6 +10,11 @@ public class PostLoginListener implements Listener{
 
     @EventHandler
     public void onPostLogin(PostLoginEvent e){
-        PermPlayer.getPermPlayers().add(BungeePexBridge.get().loadPlayer(e.getPlayer().getUniqueId()));
+        try {
+        	PermPlayer.getPermPlayers().add(BungeePexBridge.get().loadPlayer(e.getPlayer().getUniqueId()));
+        }catch(Exception ex){
+        	System.err.println("Cant create permission player for "+e.getPlayer().getName()+"! ("+ex.getMessage()+")");
+        	ex.printStackTrace();
+        }
     }
 }
