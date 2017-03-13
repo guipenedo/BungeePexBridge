@@ -37,12 +37,6 @@ public class Config {
         for (Field f : fields) {
             f.setAccessible(true);
             try {
-                /*String path = f.getName().replaceAll("_", ".");
-                System.out.println("Path: " + path);
-                System.out.println("default value: " + f.get(this));
-                Object obj = configuration.get(path, f.get(this));
-                f.set(this, obj);
-                System.out.println("new value: " + f.get(this));*/
                 f.set(this, configuration.get(f.getName().replaceAll("_", "."), f.get(this)));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

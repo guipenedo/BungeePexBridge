@@ -11,6 +11,8 @@ import me.philipsnostrum.bungeepexbridge.modules.PermPlayer;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionSystem;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionsEx;
 import me.philipsnostrum.bungeepexbridge.permsystem.SexyPex;
+import me.philipsnostrum.bungeepexbridge.permsystem.zPermissions;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -95,6 +97,8 @@ public class BungeePexBridge extends Plugin {
             return new PermissionsEx();
         else if (config.permissionsSystem.equalsIgnoreCase("sexypex"))
             return new SexyPex();
+        else if(config.permissionsSystem.equalsIgnoreCase("ZPERMS"))
+            return new zPermissions();
         else return null;
     }
 

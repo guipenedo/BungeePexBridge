@@ -53,7 +53,7 @@ public class PermissionsEx implements PermissionSystem {
         }
         return new ArrayList<String>();
     }
-
+  
     @Override
     public long getRank(String group) {
         try {
