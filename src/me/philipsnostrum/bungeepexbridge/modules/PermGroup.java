@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class PermGroup implements Comparable<PermGroup> {
-    private static ArrayList<PermGroup> permGroups = new ArrayList<PermGroup>();
+    private static ArrayList<PermGroup> permGroups = new ArrayList<>();
     private String name;
     private long rank;
-    private ArrayList<String> permissions = new ArrayList<String>(), revoked = new ArrayList<String>(), players = new ArrayList<String>();
+    private ArrayList<String> permissions = new ArrayList<>(), revoked = new ArrayList<>(), players = new ArrayList<>();
     private boolean inheritanceSetup = false;
     private boolean defaultGroup = false;
 
@@ -20,7 +20,7 @@ public class PermGroup implements Comparable<PermGroup> {
         this.rank = BungeePexBridge.getPerms().getRank(name);
     }
 
-    public static ArrayList<PermGroup> getPermGroups() {
+    private static ArrayList<PermGroup> getPermGroups() {
         return permGroups;
     }
 
@@ -35,7 +35,7 @@ public class PermGroup implements Comparable<PermGroup> {
         return null;
     }
 
-    public static PermGroup getDefaultGroup() {
+    private static PermGroup getDefaultGroup() {
         for (PermGroup permGroup : getPermGroups())
             if (permGroup.isDefaultGroup())
                 return permGroup;
@@ -43,7 +43,7 @@ public class PermGroup implements Comparable<PermGroup> {
     }
 
     public static ArrayList<PermGroup> getPlayerGroups(UUID uuid) {
-        ArrayList<PermGroup> groups = new ArrayList<PermGroup>();
+        ArrayList<PermGroup> groups = new ArrayList<>();
         for (PermGroup permGroup : getPermGroups())
             if (permGroup.getPlayers().contains(uuid.toString()))
                 groups.add(permGroup);
@@ -57,7 +57,8 @@ public class PermGroup implements Comparable<PermGroup> {
     }
 
     private void loadPermissions(List<String> permissions) {
-        for (String perm : permissions) {
+        for (String permission : permissions) {
+            String perm = permission.toLowerCase();
             if (perm.startsWith("-"))
                 revoked.add(perm.replace("-", ""));
             else this.permissions.add(perm);
@@ -70,12 +71,12 @@ public class PermGroup implements Comparable<PermGroup> {
         return revoked;
     }
 
-    public boolean isDefaultGroup() {
+    private boolean isDefaultGroup() {
         return defaultGroup;
     }
 
-    public void setDefaultGroup(boolean defaultGroup) {
-        this.defaultGroup = defaultGroup;
+    public void setDefaultGroup() {
+        this.defaultGroup = true;
     }
 
     public String getName() {
@@ -94,8 +95,8 @@ public class PermGroup implements Comparable<PermGroup> {
         return this.inheritanceSetup;
     }
 
-    public void setInheritanceSetup(boolean inheritanceSetup) {
-        this.inheritanceSetup = inheritanceSetup;
+    public void setInheritanceSetup() {
+        this.inheritanceSetup = true;
     }
 
     @Override

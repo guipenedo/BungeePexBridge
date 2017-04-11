@@ -12,7 +12,6 @@ import me.philipsnostrum.bungeepexbridge.permsystem.PermissionSystem;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionsEx;
 import me.philipsnostrum.bungeepexbridge.permsystem.SexyPex;
 import me.philipsnostrum.bungeepexbridge.permsystem.zPermissions;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -112,8 +111,8 @@ public class BungeePexBridge extends Plugin {
             getProxy().getScheduler().runAsync(this, new Runnable() {
                 @Override
                 public void run() {
-                    ArrayList<PermGroup> groups = new ArrayList<PermGroup>();
-                    ArrayList<PermPlayer> players = new ArrayList<PermPlayer>();
+                    ArrayList<PermGroup> groups = new ArrayList<>();
+                    ArrayList<PermPlayer> players = new ArrayList<>();
                     try {
                         for (String group : getPerms().getGroups())
                             groups.add(new PermGroup(group));
@@ -131,7 +130,7 @@ public class BungeePexBridge extends Plugin {
                         if (defaultGroupName != null) {
                             PermGroup defaultGroup = PermGroup.getPermGroup(defaultGroupName);
                             if (defaultGroup != null)
-                                defaultGroup.setDefaultGroup(true);
+                                defaultGroup.setDefaultGroup();
                         }
 
                         for (ProxiedPlayer player : getProxy().getPlayers())
@@ -151,9 +150,9 @@ public class BungeePexBridge extends Plugin {
         }
     }
 
-    public void setupInheritance(PermGroup group) {
+    private void setupInheritance(PermGroup group) {
         try {
-            group.setInheritanceSetup(true);
+            group.setInheritanceSetup();
             for (String groupName : permissionSystem.getInheritance(group.getName())) {
                 PermGroup childGroup = PermGroup.getPermGroup(groupName);
                 if (childGroup == null)
@@ -163,13 +162,13 @@ public class BungeePexBridge extends Plugin {
                     setupInheritance(childGroup);
 
                 //get child permissions and remove ones revoked by this group
-                ArrayList<String> permissions = new ArrayList<String>();
+                ArrayList<String> permissions = new ArrayList<>();
                 permissions.addAll(childGroup.getPermissions());
                 for (String perm : group.getRevoked())
                     permissions.remove(perm);
 
                 //get child revoked permissions and remove ones given to this group
-                ArrayList<String> revoked = new ArrayList<String>();
+                ArrayList<String> revoked = new ArrayList<>();
                 revoked.addAll(childGroup.getRevoked());
                 for (String perm : group.getPermissions())
                     revoked.remove("-" + perm);
@@ -195,6 +194,7 @@ public class BungeePexBridge extends Plugin {
     }
 
     public boolean hasPermission(UUID uuid, String permission) {
+        permission = permission.toLowerCase();
         PermPlayer permPlayer = PermPlayer.getPlayer(uuid);
         if (permPlayer != null && permPlayer.hasPermission("-" + permission))
             return false;

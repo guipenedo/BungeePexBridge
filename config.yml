@@ -1,9 +1,7 @@
 # Configuration file
 # #################
 # How to setup:
-# 1. Follow the instructions at https://goo.gl/ESlSaR to setup mysql backend on PEX
-# 2. Fill the options below with your database connection details
-# 3. Start up the server and enjoy!
+# Follow the instructions at https://github.com/guipenedo/BungeePexBridge/wiki for your permissions system
 #
 # If you require assistance contact me:
 #   EMAIL: nostrumg@gmail.com SKYPE: gui_poseidon
@@ -33,7 +31,7 @@ mysql:
   # MySQL Port
   port: '3306'
 
-# Minutes between updating/reloading permissions automatically
+# Minutes between updating/reloading permissions automatically (the lower the value, the laggier the plugin will be)
 updateInterval: 120
 
 
@@ -58,11 +56,13 @@ sexypex:
     # If you didn't change the default values on permissionsex's config for 'aliases' leave as it is
     permissions: permissions
     permissionsInheritance: permissions_inheritance
+
+# zPerms settings
 zperms:
   tables:
 
     # ZPERMS MySQL table names
-    # If you didn't change the default values on permissionsex's config for 'aliases' leave as it is
+    # If you didn't change the default values on zperms's config for 'aliases' leave as it is
     permissions: entries
     permissionsInheritance: inheritances
     memberships: memberships

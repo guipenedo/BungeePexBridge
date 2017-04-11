@@ -9,17 +9,13 @@ import java.util.UUID;
 public class PermPlayer {
     private static ArrayList<PermPlayer> permPlayers = new ArrayList<>();
     private UUID uuid;
-    private List<String> permissions;
+    private List<String> permissions = new ArrayList<>();
 
-    public PermPlayer(UUID uuid) {
+    public PermPlayer(UUID uuid) throws Exception {
         this.uuid = uuid;
-        try {
-            permissions = BungeePexBridge.getPerms().getPlayerPermissions(BungeePexBridge.get().getProxy().getPlayer(uuid));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        for (String p : BungeePexBridge.getPerms().getPlayerPermissions(BungeePexBridge.get().getProxy().getPlayer(uuid)))
+            this.permissions.add(p.toLowerCase());
     }
-
 
     public static ArrayList<PermPlayer> getPermPlayers() {
         return permPlayers;
@@ -34,12 +30,12 @@ public class PermPlayer {
             throw new NullPointerException("Invalid uuid!");
         for (PermPlayer permPlayer : getPermPlayers())
             if (permPlayer != null) //Funny why can this be null
-                if (permPlayer.getUuid().toString().replace("-","").equalsIgnoreCase(uuid.toString().replace("-","")))
+                if (permPlayer.getUuid().toString().replace("-", "").equalsIgnoreCase(uuid.toString().replace("-", "")))
                     return permPlayer;
         return null;
     }
 
-    public UUID getUuid() {
+    private UUID getUuid() {
         return uuid;
     }
 
