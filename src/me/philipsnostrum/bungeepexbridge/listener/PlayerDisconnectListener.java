@@ -6,6 +6,7 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerDisconnectListener implements Listener {
@@ -17,8 +18,11 @@ public class PlayerDisconnectListener implements Listener {
             group.getPlayers().remove(e.getPlayer().getUniqueId().toString());
 
         PermPlayer permPlayer = PermPlayer.getPlayer(e.getPlayer().getUniqueId());
-        if (permPlayer != null)
-            PermPlayer.getPermPlayers().remove(permPlayer);
+        if (permPlayer != null) {
+            ArrayList<PermPlayer> players = (ArrayList<PermPlayer>) PermPlayer.getPermPlayers().clone();
+            players.remove(permPlayer);
+            PermPlayer.setPermPlayers(players);
+        }
 
         //clear groups
         e.getPlayer().removeGroups(e.getPlayer().getGroups().toArray(new String[e.getPlayer().getGroups().size()]));

@@ -133,8 +133,11 @@ public class BungeePexBridge extends Plugin {
                                 defaultGroup.setDefaultGroup();
                         }
 
-                        for (ProxiedPlayer player : getProxy().getPlayers())
-                            players.add(loadPlayer(player.getUniqueId()));
+                        for (ProxiedPlayer player : getProxy().getPlayers()) {
+                            PermPlayer pl = loadPlayer(player.getUniqueId());
+                            if(pl != null)
+                                players.add(pl);
+                        }
 
                         if (sender != null)
                             sender.sendMessage(new ComponentBuilder("Bungee permissions synced with " + config.permissionsSystem).color(ChatColor.GREEN).create());
