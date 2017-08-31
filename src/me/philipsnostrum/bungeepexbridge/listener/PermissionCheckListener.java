@@ -13,7 +13,6 @@ public class PermissionCheckListener implements Listener {
     public void onPermissionCheck(PermissionCheckEvent e) {
         if (BungeePexBridge.getDB().enabled && e.getSender() instanceof ProxiedPlayer) {
             boolean hasPerm = BungeePexBridge.get().hasPermission(((ProxiedPlayer) e.getSender()).getUniqueId(), e.getPermission());
-            BungeePexBridge.get().getLogger().info("Player has perm \"" + e.getPermission() + "\" " + hasPerm);
             e.setHasPermission(hasPerm);
         }
     }
