@@ -60,13 +60,15 @@ public class MySQL {
 
     public void close(){
         for(int i = 0; i < MAX_CONNECTIONS; i++) {
-            Connection connection = connectionPool[i].connection;
-            try {
-                if (connection != null && !connection.isClosed())
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        	if(connectionPool[i] != null) {
+				Connection connection = connectionPool[i].connection;
+				try {
+					if (connection != null && !connection.isClosed())
+						connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
         }
     }
 
