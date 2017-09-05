@@ -34,7 +34,9 @@ public class DebugPlayer {
             if (permPlayer != null)
                 fileWriter.write(gson.toJson(permPlayer));
             fileWriter.write("\ngroups:\n");
-            if (permGroups != null)
+            if (BungeePexBridge.getConfig().permissionsSystem.equalsIgnoreCase("Sexypex"))
+                fileWriter.write(player.getGroups() + "\n");
+            else if (permGroups != null)
                 fileWriter.write(gson.toJson(permGroups) + "\n");
             fileWriter.close();
         } catch (IOException e) {

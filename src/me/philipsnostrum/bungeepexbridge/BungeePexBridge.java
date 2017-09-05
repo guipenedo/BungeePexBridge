@@ -47,6 +47,11 @@ public class BungeePexBridge extends Plugin {
         return instance.permissionSystem;
     }
 
+    public static void debug(String msg) {
+        if (getConfig().debug)
+            instance.getLogger().log(Level.INFO, msg);
+    }
+
     public void onEnable() {
         instance = this;
 
@@ -96,7 +101,7 @@ public class BungeePexBridge extends Plugin {
             return new PermissionsEx();
         else if (config.permissionsSystem.equalsIgnoreCase("sexypex"))
             return new SexyPex();
-        else if(config.permissionsSystem.equalsIgnoreCase("ZPERMS"))
+        else if (config.permissionsSystem.equalsIgnoreCase("ZPERMS"))
             return new zPermissions();
         else return null;
     }
@@ -135,7 +140,7 @@ public class BungeePexBridge extends Plugin {
 
                         for (ProxiedPlayer player : getProxy().getPlayers()) {
                             PermPlayer pl = loadPlayer(player.getUniqueId());
-                            if(pl != null)
+                            if (pl != null)
                                 players.add(pl);
                         }
 
@@ -196,13 +201,16 @@ public class BungeePexBridge extends Plugin {
         return new PermPlayer(player.getUniqueId());
     }
 
-    public boolean hasPermission(UUID uuid, String permission) {
+    public boolean hasPermission(UUID uuid, String permission, boolean hasPermission) {
         permission = permission.toLowerCase();
         PermPlayer permPlayer = PermPlayer.getPlayer(uuid);
         if (permPlayer != null && permPlayer.hasPermission("-" + permission))
             return false;
         if (permPlayer != null && (permPlayer.hasPermission(permission) || permPlayer.hasPermission("*")))
             return true;
+        //fixes groups for sexypex - let bungeecord handle it
+        if (BungeePexBridge.getConfig().permissionsSystem.equalsIgnoreCase("Sexypex"))
+            return hasPermission;
         ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(uuid);
         for (PermGroup group : permGroups) {
             if (group == null) continue;

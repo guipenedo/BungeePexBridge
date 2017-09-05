@@ -9,11 +9,9 @@ import net.md_5.bungee.event.EventPriority;
 
 public class PermissionCheckListener implements Listener {
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPermissionCheck(PermissionCheckEvent e) {
-        if (BungeePexBridge.getDB().enabled && e.getSender() instanceof ProxiedPlayer) {
-            boolean hasPerm = BungeePexBridge.get().hasPermission(((ProxiedPlayer) e.getSender()).getUniqueId(), e.getPermission());
-            e.setHasPermission(hasPerm);
-        }
+        if (BungeePexBridge.getDB().enabled && e.getSender() instanceof ProxiedPlayer)
+            e.setHasPermission(BungeePexBridge.get().hasPermission(((ProxiedPlayer) e.getSender()).getUniqueId(), e.getPermission(), e.hasPermission()));
     }
 }

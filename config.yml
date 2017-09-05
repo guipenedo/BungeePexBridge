@@ -68,3 +68,7 @@ zperms:
     memberships: memberships
     entities: entities
 def-group: "Survivor"
+
+
+# For development purposes
+debug: false

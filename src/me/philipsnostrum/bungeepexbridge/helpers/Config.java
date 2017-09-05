@@ -34,6 +34,8 @@ public class Config {
     public String zperms_tables_memberships = "memberships";
     public String zperms_tables_entries = "entries";
     public String zperms_tables_entities = "entities";
+    //debug
+    public boolean debug = false;
 
     public Config() {
         loadConfig();

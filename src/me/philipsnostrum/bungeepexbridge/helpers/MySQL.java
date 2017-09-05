@@ -25,7 +25,7 @@ public class MySQL {
 
 		public boolean isValid() throws SQLException{
 			if(!valid)
-				return valid;
+				return false;
 
     		if(lastTested + 30 * 1000 < System.currentTimeMillis()){
     			if(!connection.isClosed() && connection.isValid(10))
