@@ -3,18 +3,24 @@ package me.philipsnostrum.bungeepexbridge.modules;
 import me.philipsnostrum.bungeepexbridge.BungeePexBridge;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class PermPlayer {
     private static ArrayList<PermPlayer> permPlayers = new ArrayList<>();
     private UUID uuid;
-    private List<String> permissions = new ArrayList<>();
+    private ArrayList<String> permissions = new ArrayList<>(), revoked = new ArrayList<>();
 
     public PermPlayer(UUID uuid) throws Exception {
         this.uuid = uuid;
-        for (String p : BungeePexBridge.getPerms().getPlayerPermissions(BungeePexBridge.get().getProxy().getPlayer(uuid)))
-            this.permissions.add(p.toLowerCase());
+
+        for (String permission : BungeePexBridge.getPerms().getPlayerPermissions(BungeePexBridge.get().getProxy().getPlayer(uuid))) {
+            String perm = permission.toLowerCase();
+            if (perm.startsWith("-"))
+                revoked.add(perm.replace("-", ""));
+            else this.permissions.add(perm);
+        }
+        for (String perm : revoked)
+            this.permissions.remove(perm);
     }
 
     public static ArrayList<PermPlayer> getPermPlayers() {
@@ -41,5 +47,13 @@ public class PermPlayer {
 
     public boolean hasPermission(String permission) {
         return permissions.contains(permission);
+    }
+    
+    public ArrayList<String> getPermissions() {
+        return permissions;
+    }
+    
+    public ArrayList<String> getRevoked() {
+        return revoked;
     }
 }
