@@ -67,9 +67,6 @@ public class PermGroup implements Comparable<PermGroup> {
             this.permissions.remove(perm);
     }
 
-    public ArrayList<String> getRevoked() {
-        return revoked;
-    }
 
     private boolean isDefaultGroup() {
         return defaultGroup;
@@ -81,10 +78,6 @@ public class PermGroup implements Comparable<PermGroup> {
 
     public String getName() {
         return name;
-    }
-
-    public ArrayList<String> getPermissions() {
-        return permissions;
     }
 
     public ArrayList<String> getPlayers() {
@@ -109,5 +102,13 @@ public class PermGroup implements Comparable<PermGroup> {
     @Override
     public String toString() {
         return "name=" + name + " rank=" + rank;
+    }
+
+    public ArrayList<String> getPermissions() {
+        return permissions;
+    }
+
+    public ArrayList<String> getRevoked() {
+        return revoked;
     }
 }
