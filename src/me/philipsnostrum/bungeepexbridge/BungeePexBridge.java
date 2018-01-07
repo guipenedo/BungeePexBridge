@@ -204,7 +204,7 @@ public class BungeePexBridge extends Plugin {
     public boolean hasPermission(UUID uuid, String permission, boolean hasPermission) {
         permission = permission.toLowerCase();
         PermPlayer permPlayer = PermPlayer.getPlayer(uuid);
-        if (permPlayer != null && permPlayer.hasPermission("-" + permission))
+        if (permPlayer != null && permPlayer.getRevoked().contains(permission))
             return false;
         if (permPlayer != null && (permPlayer.hasPermission(permission) || permPlayer.hasPermission("*")))
             return true;
@@ -218,6 +218,22 @@ public class BungeePexBridge extends Plugin {
             if (group.getPermissions().contains(permission) || group.getPermissions().contains("*")) return true;
         }
         return false;
+    }
+    
+    public ArrayList<String> getEffectivePermissions(UUID uuid){
+    	ArrayList<String> permissions = new ArrayList<>();
+		ArrayList<String> revoked = new ArrayList<>();
+		
+		revoked.addAll(PermPlayer.getPlayer(uuid).getRevoked());
+		
+		PermGroup.getPlayerGroups(uuid).forEach(group -> permissions.addAll(group.getPermissions()));
+		PermGroup.getPlayerGroups(uuid).forEach(group -> revoked.addAll(group.getRevoked()));
+
+		permissions.removeIf(perm -> revoked.contains(perm));
+		
+		permissions.addAll(PermPlayer.getPlayer(uuid).getPermissions());
+    	
+    	return permissions;    	
     }
 }
 
