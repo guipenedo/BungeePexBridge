@@ -51,7 +51,8 @@ public class Config {
         }
     }
 
-    public void loadConfig() {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void loadConfig() {
         try {
             if (!BungeePexBridge.get().getDataFolder().exists())
                 BungeePexBridge.get().getDataFolder().mkdir();

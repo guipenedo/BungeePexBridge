@@ -2,24 +2,25 @@ package me.philipsnostrum.bungeepexbridge.helpers;
 
 import com.google.gson.Gson;
 import me.philipsnostrum.bungeepexbridge.BungeePexBridge;
-import me.philipsnostrum.bungeepexbridge.modules.PermGroup;
-import me.philipsnostrum.bungeepexbridge.modules.PermPlayer;
+import me.philipsnostrum.bungeepexbridge.models.PermPlayer;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DebugPlayer {
-    public static void debug(ProxiedPlayer player) {
+    public static void debug(ProxiedPlayer player, CommandSender sender) {
         PermPlayer permPlayer = PermPlayer.getPlayer(player.getUniqueId());
-        ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(player.getUniqueId());
 
         Gson gson = new Gson();
 
         File file = new File(BungeePexBridge.get().getDataFolder().getAbsolutePath() + File.separator + "debug", player.getDisplayName() + ".yml");
-        System.out.println("Created file at: " + file.getAbsolutePath());
+        sender.sendMessage(new ComponentBuilder("Created file at: " + file.getAbsolutePath()).color(ChatColor.GREEN).create());
 
         file.getParentFile().mkdirs();
         try {
@@ -31,13 +32,11 @@ public class DebugPlayer {
         try {
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write("player:\n");
-            if (permPlayer != null)
-                fileWriter.write(gson.toJson(permPlayer));
-            fileWriter.write("\ngroups:\n");
-            if (BungeePexBridge.getConfig().permissionsSystem.equalsIgnoreCase("Sexypex"))
+            fileWriter.write(gson.toJson(permPlayer));
+            if (BungeePexBridge.getConfig().permissionsSystem.equalsIgnoreCase("Sexypex")) {
+                fileWriter.write("\ngroups:\n");
                 fileWriter.write(player.getGroups() + "\n");
-            else if (permGroups != null)
-                fileWriter.write(gson.toJson(permGroups) + "\n");
+            }
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();

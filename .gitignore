@@ -2,3 +2,6 @@
 .classpath
 .project
 *.iml
+out/
+.idea
+libs/

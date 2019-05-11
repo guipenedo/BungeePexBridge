@@ -1,6 +1,9 @@
 package me.philipsnostrum.bungeepexbridge.helpers;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -12,39 +15,14 @@ public class MySQL {
 	private Properties info;
     public boolean enabled;
 
-    private static final class CachedConnection {
-    	private Connection connection;
-    	private long lastTested;
-    	private boolean valid = true;
-
-    	public CachedConnection(Connection connection, long lastTested) {
-			this.connection = connection;
-			this.lastTested = lastTested;
-		}
-
-
-		public boolean isValid() throws SQLException{
-			if(!valid)
-				return false;
-
-    		if(lastTested + 30 * 1000 < System.currentTimeMillis()){
-    			if(!connection.isClosed() && connection.isValid(10))
-    				return true;
-    			else
-    				valid = false;
-    		}
-    		return valid;
-    	}
-    }
-
-	private static final int MAX_CONNECTIONS = 8;
-	private static CachedConnection[] connectionPool = new CachedConnection[MAX_CONNECTIONS];
-
+    private static final int MAX_CONNECTIONS = 8;
+    private static CachedConnection[] connectionPool = new CachedConnection[MAX_CONNECTIONS];
 	public MySQL(String host, String user, String pass, String database, String port){
 		info = new Properties();
 		info.put("autoReconnect", "true");
 		info.put("user", user);
 		info.put("password", pass);
+        info.put("useSSL", "false");
 		info.put("useUnicode", "true");
 		info.put("characterEncoding", "utf8");
 		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
@@ -57,20 +35,6 @@ public class MySQL {
         	enabled = false;
         }
 	}
-
-    public void close(){
-        for(int i = 0; i < MAX_CONNECTIONS; i++) {
-        	if(connectionPool[i] != null) {
-				Connection connection = connectionPool[i].connection;
-				try {
-					if (connection != null && !connection.isClosed())
-						connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-        }
-    }
 
 	/**
 	 * Gets the database connection for
@@ -96,16 +60,27 @@ public class MySQL {
 		}
 
 		//Throw the last exception to break the stack. Dont do stuff this an broken SQL connection.
-		if(last != null){
-			System.err.println("Having exception on finding next connection!");
-			throw last;
-		}
+        System.err.println("Having exception on finding next connection!");
+        throw last;
 
-		throw new SQLException("Cant find a valid SQL connection!");
-	}
+    }
+
+    public void close() {
+        for (int i = 0; i < MAX_CONNECTIONS; i++) {
+            if (connectionPool[i] != null) {
+                Connection connection = connectionPool[i].connection;
+                try {
+                    if (connection != null && !connection.isClosed())
+                        connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public List<String> resultSetToList(ResultSet res, String column){
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         try {
             while (res.next())
                 list.add(res.getString(column));
@@ -113,5 +88,30 @@ public class MySQL {
             e.printStackTrace();
         }
         return list;
+    }
+
+    private static final class CachedConnection {
+        private Connection connection;
+        private long lastTested;
+        private boolean valid = true;
+
+        CachedConnection(Connection connection, long lastTested) {
+            this.connection = connection;
+            this.lastTested = lastTested;
+        }
+
+
+        boolean isValid() throws SQLException {
+            if (!valid)
+                return false;
+
+            if (lastTested + 30 * 1000 < System.currentTimeMillis()) {
+                if (!connection.isClosed() && connection.isValid(10))
+                    return true;
+                else
+                    valid = false;
+            }
+            return valid;
+        }
     }
 }

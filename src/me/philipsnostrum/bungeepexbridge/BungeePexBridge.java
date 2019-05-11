@@ -2,12 +2,13 @@ package me.philipsnostrum.bungeepexbridge;
 
 import me.philipsnostrum.bungeepexbridge.commands.BPerms;
 import me.philipsnostrum.bungeepexbridge.helpers.Config;
+import me.philipsnostrum.bungeepexbridge.helpers.Metrics;
 import me.philipsnostrum.bungeepexbridge.helpers.MySQL;
 import me.philipsnostrum.bungeepexbridge.listener.PermissionCheckListener;
 import me.philipsnostrum.bungeepexbridge.listener.PlayerDisconnectListener;
 import me.philipsnostrum.bungeepexbridge.listener.PostLoginListener;
-import me.philipsnostrum.bungeepexbridge.modules.PermGroup;
-import me.philipsnostrum.bungeepexbridge.modules.PermPlayer;
+import me.philipsnostrum.bungeepexbridge.models.PermGroup;
+import me.philipsnostrum.bungeepexbridge.models.PermPlayer;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionSystem;
 import me.philipsnostrum.bungeepexbridge.permsystem.PermissionsEx;
 import me.philipsnostrum.bungeepexbridge.permsystem.SexyPex;
@@ -19,9 +20,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.scheduler.BungeeScheduler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -66,6 +66,8 @@ public class BungeePexBridge extends Plugin {
         } else
             getLogger().log(Level.INFO, "Permission system " + config.permissionsSystem + " loaded successfully!");
 
+        Metrics metrics = new Metrics(this);
+        metrics.addCustomChart(new Metrics.SimplePie("permission_plugin", () -> config.permissionsSystem));
 
         if (permissionSystem.requiresMySQL()) {
             //database
@@ -87,12 +89,9 @@ public class BungeePexBridge extends Plugin {
         initialize(null);
 
         //update every x minutes
-        new BungeeScheduler().schedule(instance, new Runnable() {
-            @Override
-            public void run() {
-                if (mysql.enabled)
-                    initialize(null);
-            }
+        new BungeeScheduler().schedule(instance, () -> {
+            if (mysql.enabled)
+                initialize(null);
         }, config.updateInterval, config.updateInterval, TimeUnit.MINUTES);
     }
 
@@ -113,71 +112,60 @@ public class BungeePexBridge extends Plugin {
 
     public void initialize(final CommandSender sender) {
         try {
-            getProxy().getScheduler().runAsync(this, new Runnable() {
-                @Override
-                public void run() {
-                    ArrayList<PermGroup> groups = new ArrayList<>();
-                    ArrayList<PermPlayer> players = new ArrayList<>();
-                    try {
-                        for (String group : getPerms().getGroups())
-                            groups.add(new PermGroup(group));
+            getProxy().getScheduler().runAsync(this, () -> {
+                TreeMap<String, PermGroup> groups = new TreeMap<>();
+                TreeMap<UUID, PermPlayer> players = new TreeMap<>();
+                try {
+                    for (String group : getPerms().getGroups())
+                        groups.put(group, new PermGroup(group));
 
-                        //sort based on rank if available
-                        Collections.sort(groups);
+                    for (PermGroup permGroup : groups.values())
+                        setupInheritance(permGroup, groups);
 
-                        PermGroup.setPermGroups(groups);
+                    PermGroup.setDefaultGroup(null);
+                    PermGroup.setPermGroups(groups);
 
-                        for (PermGroup permGroup : groups) {
-                            setupInheritance(permGroup);
-                        }
+                    String defaultGroupName = permissionSystem.getDefaultGroup();
+                    if (defaultGroupName != null)
+                        PermGroup.setDefaultGroup(PermGroup.getPermGroup(defaultGroupName));
 
-                        String defaultGroupName = permissionSystem.getDefaultGroup();
-                        if (defaultGroupName != null) {
-                            PermGroup defaultGroup = PermGroup.getPermGroup(defaultGroupName);
-                            if (defaultGroup != null)
-                                defaultGroup.setDefaultGroup();
-                        }
+                    // players
+                    for (ProxiedPlayer player : getProxy().getPlayers())
+                        players.put(player.getUniqueId(), loadPlayer(player.getUniqueId()));
 
-                        for (ProxiedPlayer player : getProxy().getPlayers()) {
-                            PermPlayer pl = loadPlayer(player.getUniqueId());
-                            if (pl != null)
-                                players.add(pl);
-                        }
+                    PermPlayer.setPermPlayers(new ConcurrentHashMap<>(players));
 
-                        if (sender != null)
-                            sender.sendMessage(new ComponentBuilder("Bungee permissions synced with " + config.permissionsSystem).color(ChatColor.GREEN).create());
-                    } catch (Exception e) {
-                        if (sender != null)
-                            sender.sendMessage(new ComponentBuilder("Bungee permissions could not sync with " + config.permissionsSystem).color(ChatColor.RED).create());
-                        e.printStackTrace();
-                    }
-                    PermPlayer.setPermPlayers(players);
+
+                    if (sender != null)
+                        sender.sendMessage(new ComponentBuilder("Bungee permissions synced with " + config.permissionsSystem).color(ChatColor.GREEN).create());
+                } catch (Exception e) {
+                    if (sender != null)
+                        sender.sendMessage(new ComponentBuilder("Bungee permissions could not sync with " + config.permissionsSystem).color(ChatColor.RED).create());
+                    e.printStackTrace();
                 }
             });
         } catch (java.util.concurrent.RejectedExecutionException ignored) {
         }
     }
 
-    private void setupInheritance(PermGroup group) {
+    private void setupInheritance(PermGroup group, Map<String, PermGroup> groups) {
         try {
             group.setInheritanceSetup();
             for (String groupName : permissionSystem.getInheritance(group.getName())) {
-                PermGroup childGroup = PermGroup.getPermGroup(groupName);
+                PermGroup childGroup = groups.get(groupName);
                 if (childGroup == null)
                     continue;
 
                 if (!childGroup.isInheritanceSetup())
-                    setupInheritance(childGroup);
+                    setupInheritance(childGroup, groups);
 
                 //get child permissions and remove ones revoked by this group
-                ArrayList<String> permissions = new ArrayList<>();
-                permissions.addAll(childGroup.getPermissions());
+                ArrayList<String> permissions = new ArrayList<>(childGroup.getPermissions());
                 for (String perm : group.getRevoked())
                     permissions.remove(perm);
 
                 //get child revoked permissions and remove ones given to this group
-                ArrayList<String> revoked = new ArrayList<>();
-                revoked.addAll(childGroup.getRevoked());
+                ArrayList<String> revoked = new ArrayList<>(childGroup.getRevoked());
                 for (String perm : group.getPermissions())
                     revoked.remove("-" + perm);
                 group.getPermissions().addAll(permissions);
@@ -192,27 +180,30 @@ public class BungeePexBridge extends Plugin {
         ProxiedPlayer player = getProxy().getPlayer(uuid);
         if (player == null)
             throw new NullPointerException("Can't find the player `" + (uuid == null ? "unknown" : uuid.toString()) + "`");
-
+        PermPlayer pplayer = new PermPlayer(player.getUniqueId());
+        List<PermGroup> groups = new LinkedList<>();
         for (String group : permissionSystem.getPlayerGroups(player)) {
             PermGroup permGroup = PermGroup.getPermGroup(group);
             if (permGroup != null)
-                permGroup.getPlayers().add(uuid.toString());
+                groups.add(permGroup);
         }
-        return new PermPlayer(player.getUniqueId());
+        pplayer.setGroups(groups);
+        return pplayer;
     }
 
     public boolean hasPermission(UUID uuid, String permission, boolean hasPermission) {
-        permission = permission.toLowerCase();
-        PermPlayer permPlayer = PermPlayer.getPlayer(uuid);
-        if (permPlayer != null && permPlayer.hasPermission("-" + permission))
-            return false;
-        if (permPlayer != null && (permPlayer.hasPermission(permission) || permPlayer.hasPermission("*")))
-            return true;
         //fixes groups for sexypex - let bungeecord handle it
         if (BungeePexBridge.getConfig().permissionsSystem.equalsIgnoreCase("Sexypex"))
             return hasPermission;
-        ArrayList<PermGroup> permGroups = PermGroup.getPlayerGroups(uuid);
-        for (PermGroup group : permGroups) {
+        permission = permission.toLowerCase();
+        PermPlayer permPlayer = PermPlayer.getPlayer(uuid);
+        if (permPlayer == null) return false;
+        if (permPlayer.hasPermission("-" + permission))
+            return false;
+        if (permPlayer.hasPermission(permission) || permPlayer.hasPermission("*"))
+            return true;
+
+        for (PermGroup group : permPlayer.getGroups()) {
             if (group == null) continue;
             if (group.getRevoked().contains(permission)) return false;
             if (group.getPermissions().contains(permission) || group.getPermissions().contains("*")) return true;

@@ -20,7 +20,7 @@ public class PermissionsEx implements PermissionSystem {
     @Override
     public List<String> getGroups() throws SQLException {
         Connection c = BungeePexBridge.getDB().getNextConnection();
-        ResultSet res = c.createStatement().executeQuery("SELECT DISTINCT(name) as name FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name NOT LIKE 'system' AND name NOT LIKE '%-%' AND type='0'");
+        ResultSet res = c.createStatement().executeQuery("SELECT DISTINCT(name) as name FROM `" + BungeePexBridge.getConfig().pex_tables_permissions + "` WHERE name NOT LIKE 'system' AND type='0'");
         return BungeePexBridge.getDB().resultSetToList(res, "name");
     }
 
